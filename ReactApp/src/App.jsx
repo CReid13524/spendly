@@ -2,6 +2,7 @@ import React from 'react'
 import { Routes, Route, Link } from 'react-router-dom'
 
 // Example components
+import Login from './pages/login'
 import Dashboard from './pages/dashboard'
 import Categories from './pages/categories'
 import Reconcile from './pages/reconcile'
@@ -13,6 +14,7 @@ function App() {
   return (
     <>
       <Routes>
+        <Route path="/login" element={<Login />} />
           <Route path="/" element={<Dashboard />} />
           <Route path="/categories" element={<Categories />} />
           <Route path="/reconcile" element={<Reconcile />} />
@@ -22,6 +24,7 @@ function App() {
       </Routes>
       <nav>
         <ul>
+          <li><Link to="/login">Login</Link></li>
           <li><Link to="/">Dashboard</Link></li>
           <li><Link to="/categories">Categories</Link></li>
           <li><Link to="/reconcile">Reconcile</Link></li>
