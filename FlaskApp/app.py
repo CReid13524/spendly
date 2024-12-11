@@ -4,7 +4,7 @@ import sqlite3
 app = Flask(__name__)
 
 def get_db():
-    database = 'FlaskApp\spendly.db'
+    database = r'FlaskApp\spendly.db'
     db = sqlite3.connect(database)
     return db.cursor()
 
