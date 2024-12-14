@@ -1,9 +1,14 @@
 -- Create User table
 CREATE TABLE User (
     userID INTEGER PRIMARY KEY AUTOINCREMENT,
-    password TEXT NOT NULL,
-    dateCreated TEXT NOT NULL,
-    lastLogin TEXT
+    email TEXT NULL,
+    googleEmail TEXT NULL,
+    googleImage TEXT NULL,
+    googleID TEXT NULL ,
+    password TEXT  NULL,
+    name TEXT NULL,
+    dateCreated TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    lastLogin TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Create Category table
