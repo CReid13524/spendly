@@ -1,0 +1,155 @@
+html, body {
+    margin: 0;
+    background-color: #0A9CEB;
+    font-family: "Inter", sans-serif;
+    font-size: 16px;
+}
+
+:root {
+    height: 100%;
+    
+    .error-message {
+        min-height: fit-content;
+        height: 150px;
+        width: 200px;
+        background-color: #fff;
+        border-radius: 10px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5);
+        font-size: 16px;
+        z-index: 1;
+        padding: 10px; 
+        overflow-wrap: anywhere;
+        
+        .error-head {
+            font-size: 16px;
+        }
+
+        .error-dismiss {
+            width: inherit;
+            margin-top: 3em;
+            height: 30px;
+            background-color: black;
+            color: white;
+            border-radius: 4px;
+            border: 0;
+            padding: 0;
+            cursor: pointer;
+            transition: background-color .218s;
+            font-size: 14px;
+        }
+        .error-dismiss:hover {
+            transition: background-color .218s;
+            background-color: #828282;
+        }
+    }
+    
+    
+    
+    
+
+    #login-container {
+        display: flex;
+        justify-content: center; 
+        align-items: center;    
+        height: 100vh;          
+        background-color: #8FCEFE;
+      
+        #login-page {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            
+            #login-title {
+                position: relative;
+                top: -60px;
+                text-align: center;
+                font-size: 40px;
+            }
+            h4 {
+                margin-bottom: 0pt;
+                font-size: 16px;
+            }
+            #help-text {
+                margin-top: 0.2em;
+                font-size: 14px;
+                width: 300px;
+                text-align: center;
+            }
+            input {
+                margin-bottom: 2%;
+                height: 44px;
+                color: white;
+                border-radius: 4px;
+                width: 300px;
+                border: 0;
+                padding: 0;
+                color: black;
+                padding-left: 2ch;
+                box-sizing: border-box;
+                font-size: 16px;
+                }
+            #continue-button {
+                margin-bottom: 2%;
+                height: 44px;
+                background-color: black;
+                color: white;
+                border-radius: 4px;
+                width: 300px;
+                border: 0;
+                padding: 0;
+                cursor: pointer;
+                transition: background-color .218s;
+                font-size: 14px;
+            }
+            #continue-button:hover {
+                transition: background-color .218s;
+                background-color: #828282;
+            }
+            #seperator-horizontal-line {
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+                min-width: 100%;
+                align-items: center;
+                
+                .seperator-horizontal-line-component {
+                    min-width: 40%;
+                    height: 1pt;
+                    margin-left: 2%;
+                    margin-right: 2%;
+                    background-color: #E6E6E6;
+                }
+                p {
+                    color: #828282;
+                    margin: 0;
+                }
+            }
+            #login-special-buttons, form{
+                display: flex;
+                flex-direction: column;
+                margin-top: 2%;
+            }
+            #terms-privacy-text {
+                font-size: 12px;
+                text-align: center;
+                width: 300px;
+                color: #828282;
+
+                a {
+                    text-decoration: none;
+                    color: black;
+                }
+            }
+        }
+    }
+    
+}
