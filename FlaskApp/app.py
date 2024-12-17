@@ -87,18 +87,21 @@ class Secure(Resource):
 
                 cred = data['credential']
                 id_info = id_token.verify_oauth2_token(cred, requests.Request(), app.config['GOOGLE_CLIENT_ID'])
-
                 if id_info['aud'] != app.config['GOOGLE_CLIENT_ID']:
                     raise ValueError('Could not verify audience.')
                 else:
                     verified=True
 
                 curr.execute("select userID from User where googleID=?", (id_info['sub'],))
-                if not curr.fetchone():
+                data = curr.fetchone()
+                if not data:
                     curr.execute("insert into User(googleEmail, name, googleID, googleImage) VALUES (?,?,?,?)", (id_info['email'], id_info['name'], id_info['sub'], id_info['picture']))
                     curr.connection.commit()
+                    curr = get_db()
                     curr.execute("select userID from User where googleID=?", (id_info['sub'],))
-                userID = curr.fetchone()[0]
+                    userID = curr.fetchone()[0]
+                else:
+                    userID = data[0]
                 
             else:
                 curr.execute("select userID,password from User where email=?", (data['email'],))
@@ -113,8 +116,19 @@ class Secure(Resource):
             return {'error': str(e)}, e.code
         except Exception as e:
             return  {'error': str(e)}, 500
+        
     def put(self):
-        ...
+        token = request.cookies.get('auth_token')
+        if not token:
+            return {"valid": False, "error": "Missing token"}, 401
+        try:
+            decoded = jwt.decode(token, app.config['SECURE_KEY'], algorithms=["HS256"])
+            print(decoded)
+            return {"valid": True, "user": decoded["userID"]}, 200
+        except jwt.ExpiredSignatureError:
+            return {"valid": False, "error": "Token expired"}, 401
+        except jwt.InvalidTokenError:
+            return {"valid": False, "error": "Invalid token"}, 401
     def delete(self):
         ...
 
