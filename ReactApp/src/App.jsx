@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom'
 
-// Example components
 import Login from './pages/login'
 import Dashboard from './pages/dashboard'
 import Categories from './pages/categories'
@@ -10,21 +9,9 @@ import Statistics from './pages/statistics'
 import Settings from './pages/settings'
 import NotFound from './pages/notFound'
 import LoadingAnimated from './components/loadingAnimated'
+import NavigationBar from './components/navigationBar'
 
-function Navigation() {
-  return (
-    <nav id="nav-panel">
-      <ul>
-        <li><Link to="/login">Login</Link></li>
-        <li><Link to="/">Dashboard</Link></li>
-        <li><Link to="/categories">Categories</Link></li>
-        <li><Link to="/reconcile">Reconcile</Link></li>
-        <li><Link to="/statistics">Statistics</Link></li>
-        <li><Link to="/settings">Settings</Link></li>
-      </ul>
-    </nav>
-  );
-}
+
 
 function App() {
   const [isAuthVerified, setIsAuthVerified] = useState(false);
@@ -34,8 +21,6 @@ function App() {
   const hasCheckedAuth = useRef(false);
 
   useEffect(() => {
-    let timeoutId;
-    let intervalId;
     // Run auth verification only if not on the login page
     if (location.pathname !== '/login') {
       const verifyAuth = async () => {
@@ -83,7 +68,7 @@ function App() {
 
   return (
     <>
-      {!hideNav && <Navigation/>}
+      {!hideNav && <NavigationBar/>}
       <Routes>
         <Route path="/login" element={<Login />} />
           <Route path="/" element={<Dashboard />} />
