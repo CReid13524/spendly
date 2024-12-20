@@ -16,8 +16,6 @@ html, body {
     #nav-container {
         display: flex;
         flex-direction: column; 
-    
-
         position: fixed;
         bottom: 0;
         left: 0;
@@ -28,7 +26,7 @@ html, body {
             display: flex;
             flex-direction: row;
             justify-content: space-evenly; 
-            align-content: center;
+            align-items: center;
             width: 100%;
             height: 50px; 
             background-color: white;
@@ -38,12 +36,12 @@ html, body {
 
                 svg {
                     fill: black;
-                    height: 30px;
-                    width: 30px;
+                    height: auto;
+                    width: 100%;
                 }
             }
             .active {
-                background: radial-gradient(circle, rgba(187,187,187,1) 0%, rgba(187,187,187,1) 30%, rgba(255,255,255,1) 100%);
+                background: radial-gradient(circle, rgba(187,187,187,1) 20%, rgba(255,255,255,1) 70%);
             } 
         }
     }
@@ -109,6 +107,32 @@ html, body {
         border-radius: 50%;
         animation: spin 1s ease-in-out infinite;
       }
+    
+    #page-header {
+        display: flex;
+        flex-direction: row;
+        height: fit-content;
+        padding: 5px;
+        background-color: #8FCEFE;
+        box-sizing: border-box; 
+        align-self: flex-start;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+
+        h1 {
+            margin: 0;
+        }
+
+        #header-help-button {
+
+            svg {
+                fill: black;
+                height: 30px;
+                width: 30px;
+            }
+        }
+    }
 
     #login-container {
         display: flex;
@@ -205,5 +229,28 @@ html, body {
             }
         }
     }
+
+    #settings-container {
+        display: flex;
+        flex-direction: column; 
+        height: 100vh;
+        width: 100vw;
+        background-color: #f0f0f0;
+        box-sizing: border-box;
+    
+        #settings-page {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+
+            #page-title {
+                margin: 15px;
+                font-weight:bold;
+            }
+        }
+    }
+    
     
 }
