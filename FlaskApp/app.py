@@ -5,6 +5,7 @@ import os, jwt, datetime, bcrypt, sqlite3
 from dotenv import load_dotenv
 from google.oauth2 import id_token
 from google.auth.transport import requests
+import pandas as pd
 
 
 app = Flask(__name__)
@@ -17,6 +18,18 @@ def get_db():
     database = r'FlaskApp\spendly.db'
     db = sqlite3.connect(database)
     return db.cursor()
+
+def get_auth_data():
+        token = request.cookies.get('auth_token')
+        if not token:
+            return {"valid": False, "error": "Missing token"}, 401
+        try:
+            decoded = jwt.decode(token, app.config['SECURE_KEY'], algorithms=["HS256"])
+            return {"valid": True, "user": decoded["userID"]}, 200
+        except jwt.ExpiredSignatureError:
+            return {"valid": False, "error": "Token expired"}, 401
+        except jwt.InvalidTokenError:
+            return {"valid": False, "error": "Invalid token"}, 401
 
 @api.route('/user')
 class User(Resource):
@@ -58,7 +71,7 @@ class Secure(Resource):
                 token,
                 max_age=3600,
                 httponly=True,
-                secure=True,
+                secure=False,
                 samesite='Strict'
             )
             
@@ -118,17 +131,56 @@ class Secure(Resource):
             return  {'error': str(e)}, 500
         
     def put(self):
-        token = request.cookies.get('auth_token')
-        if not token:
-            return {"valid": False, "error": "Missing token"}, 401
+        return get_auth_data()
+    
+    def delete(self):
+        ...
+
+@api.route('/record_data')
+class RecordData(Resource):
+    def get(self):
+        ...
+    def post(self):
+        file = request.files['file']
+        auth_data = get_auth_data()
+        if not auth_data[0]['valid']:
+            raise auth_data[0]['error']
+        else:
+            userID = auth_data[0]['user']
+
+        if 'file' not in request.files:
+            return {'error': 'No file part'}, 400
+        if file.filename == '':
+            return {'error': 'No selected file'}, 400
+
         try:
-            decoded = jwt.decode(token, app.config['SECURE_KEY'], algorithms=["HS256"])
-            print(decoded)
-            return {"valid": True, "user": decoded["userID"]}, 200
-        except jwt.ExpiredSignatureError:
-            return {"valid": False, "error": "Token expired"}, 401
-        except jwt.InvalidTokenError:
-            return {"valid": False, "error": "Invalid token"}, 401
+            if file.filename.endswith('.csv'):
+                df = pd.read_csv(file)
+            elif file.filename.endswith('.xlsx'):
+                df = pd.read_excel(file)
+            else:
+                return {'error': 'Unsupported file format'}, 400
+            
+            #Get uploadID
+            conn = sqlite3.connect(r'FlaskApp/spendly.db')
+            curr = conn.cursor()
+            curr.execute('insert into Upload(userID) VALUES (?)',(userID,))
+            uploadID = curr.lastrowid
+            
+            #Apply uploadID
+            df['uploadID'] = uploadID
+            
+            #Insert Data
+            df.to_sql('Transactions', conn, if_exists='append', index=False)
+            conn.commit()
+
+            return {},200
+
+        except Exception as e:
+            return {'error': str(e)}, 500
+        
+    def put(self):
+        ...
     def delete(self):
         ...
 
