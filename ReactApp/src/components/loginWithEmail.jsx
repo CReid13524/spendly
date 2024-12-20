@@ -37,7 +37,7 @@ function LoginWithEmail() {
             if (data.isStored) {
                 setIsAccount('Y')
                 if (password1) {
-                    authenticate(email,password1)
+                    await authenticate(email,password1)
                     navigate('/')
                 }
             } else {
@@ -53,7 +53,7 @@ function LoginWithEmail() {
                     if (!response.ok) {
                         throw data.error
                     }
-                    authenticate(email, password1)
+                    await authenticate(email, password1)
                     navigate('/')
                 } else if (password1) {
                     setShowPasswordInput2(true)
