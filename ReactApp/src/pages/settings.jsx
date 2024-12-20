@@ -1,8 +1,18 @@
-import React from 'react'
+import React, { useState } from 'react'
+import PageHeader from '../components/pageHeader'
+import UploadCSV from '../components/uploadCSV'
 
 function settings() {
+  
   return (
-    <div>settings</div>
+    <div id='settings-container'>
+    <div id='settings-page'>
+      <PageHeader/>
+      <div id="page-title">Settings</div>
+      <UploadCSV/>
+    </div>
+    </div>
+
   )
 }
 
