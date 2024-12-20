@@ -37,7 +37,7 @@ function LoginWithEmail() {
             if (data.isStored) {
                 setIsAccount('Y')
                 if (password1) {
-                    await authenticate(email,password1)
+                    await authenticate(email,password1).then(console.log('Authenticated, logging in...'))
                     navigate('/')
                 }
             } else {

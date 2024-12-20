@@ -25,7 +25,6 @@ function App() {
     if (location.pathname !== '/login') {
       const verifyAuth = async () => {
         try {
-          setIsAuthVerified(false)
           const response = await fetch('/api/secure', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
@@ -35,6 +34,7 @@ function App() {
             throw response.statusText
           }
           const data = await response.json();
+          console.log('Auth Data Received')
           if (!data.valid) {
             alert(`Session expired. Please log in again.\n(${data.error})`);
             navigate('/login');
@@ -49,6 +49,8 @@ function App() {
 
       if (hasCheckedAuth.current) {
       verifyAuth();
+      } else {
+        setIsAuthVerified(false)
       }
       hasCheckedAuth.current = true
 
@@ -61,23 +63,25 @@ function App() {
   
   
   // Prevent rendering pages until authentication is verified
-  if (!isAuthVerified && location.pathname !== '/login') {
-    return <LoadingAnimated/>;
-  }
-
 
   return (
     <>
-      {!hideNav && <NavigationBar/>}
+    
+      {!hideNav && isAuthVerified && <NavigationBar/>}
       <Routes>
-        <Route path="/login" element={<Login />} />
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/categories" element={<Categories />} />
-          <Route path="/reconcile" element={<Reconcile />} />
-          <Route path="/statistics" element={<Statistics />} />
-          <Route path="/settings" element={<Settings />} />
-        <Route path="*" element={<NotFound />} />
+          <Route path="/login" element={<Login />} />
+          {isAuthVerified && location.pathname !== '/login' ? 
+            <>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/categories" element={<Categories />} />
+              <Route path="/reconcile" element={<Reconcile />} />
+              <Route path="/statistics" element={<Statistics />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="*" element={<NotFound />} />
+            </> 
+            :<></> }
       </Routes>
+      {!isAuthVerified && location.pathname !== '/login' && <LoadingAnimated/>}
     </>
   )
 }
