@@ -17,7 +17,7 @@ function LoginWithGoogle() {
       if (!response.ok) {
         throw data.error
     }
-    navigate('/dashboard')
+    navigate('/')
     } catch (error) {
       setError(
         <div className='error-message'>

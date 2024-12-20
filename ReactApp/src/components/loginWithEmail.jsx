@@ -38,7 +38,7 @@ function LoginWithEmail() {
                 setIsAccount('Y')
                 if (password1) {
                     authenticate(email,password1)
-                    navigate('/dashboard')
+                    navigate('/')
                 }
             } else {
                 setIsAccount('N')
@@ -54,7 +54,7 @@ function LoginWithEmail() {
                         throw data.error
                     }
                     authenticate(email, password1)
-                    navigate('/dashboard')
+                    navigate('/')
                 } else if (password1) {
                     setShowPasswordInput2(true)
                 } 
