@@ -24,7 +24,7 @@ CREATE TABLE Category (
 -- Create Transactions table
 CREATE TABLE Transactions (
     transactionID INTEGER PRIMARY KEY AUTOINCREMENT,
-    userID INTEGER NOT NULL,
+    uploadID INTEGER NOT NULL,
     categoryID INTEGER,
     type TEXT NOT NULL,
     details TEXT,
@@ -35,6 +35,13 @@ CREATE TABLE Transactions (
     date TEXT NOT NULL,
     foreignCurrencyAmount REAL,
     conversionCharge REAL,
-    FOREIGN KEY (userID) REFERENCES User(userID) ON DELETE CASCADE,
+    FOREIGN KEY (uploadID) REFERENCES Upload(uploadID) ON DELETE CASCADE,
     FOREIGN KEY (categoryID) REFERENCES Category(categoryID) ON DELETE SET NULL
 );
+
+create table Upload(
+    uploadID INTEGER PRIMARY KEY AUTOINCREMENT,
+    userID INTEGER NOT NULL,
+    date TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (userID) REFERENCES User(userID) ON DELETE CASCADE
+); 
