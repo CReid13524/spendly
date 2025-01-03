@@ -19,7 +19,8 @@ html, body {
         position: fixed;
         bottom: 0;
         left: 0;
-        width: 100%; 
+        width: 100%;
+        z-index: 3;
         
     
         #nav-panel {
@@ -70,7 +71,7 @@ html, body {
         justify-content: center;
         box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5);
         font-size: 16px;
-        z-index: 1;
+        z-index: 2;
         padding: 10px; 
         overflow-wrap: anywhere;
         
@@ -115,15 +116,18 @@ html, body {
     
     #page-header {
         display: flex;
+        
         flex-direction: row;
-        height: fit-content;
+        height: 50px;
         padding: 5px;
         background-color: #8FCEFE;
         box-sizing: border-box; 
-        align-self: flex-start;
+        top: 0;
         justify-content: space-between;
         align-items: center;
         width: 100%;
+        align-self: start;
+        z-index: 1;
 
         h1 {
             margin: 0;
@@ -257,5 +261,91 @@ html, body {
         }
     }
     
+    #dashboard-container {
+        display: flex;
+        flex-direction: column; 
+        height: 100%;
+        width: 100vw;
+        background-color: #f0f0f0;
+        box-sizing: border-box;
+        min-height: 100vh;
+    
+        #dashboard-page {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: fit-content;
+            box-sizing: border-box;
+            align-items: center;
+
+            #dashboard-chart-main {
+                max-width: 300px;
+                max-height: 300px;
+            }
+        }
+    }
+
+    
+.transaction-modal-container {
+    position: absolute;
+    display: flex;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    height: calc(100vh);
+    width: 100vw;
+    background-color: #f0f0f0;
+    box-sizing: border-box;
+  
+    .transaction-modal {
+      margin-top: 50px;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+  
+      .transaction-data {
+        margin-left: 10px;
+  
+        .data-head {
+          margin-top: 10px;
+          margin-bottom: 20px;
+          line-height: 140%;
+        }
+      }
+  
+      .transaction-title {
+        display: flex;
+        flex-direction: column;
+        background-color: #a7d5f8;
+        align-items: center;
+        padding-bottom: 15px;
+  
+        .title-amount {
+          margin-top: 10px;
+          font-weight: 600;
+          font-size: 24px;
+        }
+  
+        .title-header {
+          display: flex;
+          justify-content: space-between;
+          width: 100%;
+  
+          svg {
+            height: auto;
+            width: 25px;
+            margin: 4px;
+          }
+  
+          .title-return {
+            display: flex;
+            align-items: center;
+            
+          }
+        }
+      }
+    }
+  }
     
 }
