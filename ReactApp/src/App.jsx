@@ -14,11 +14,13 @@ import NavigationBar from './components/navigationBar'
 
 
 function App() {
-  const [isAuthVerified, setIsAuthVerified] = useState(false);
   const location = useLocation();
   const hideNav = location.pathname === '/login';
   const navigate = useNavigate();
   const hasCheckedAuth = useRef(false);
+  const [isAuthVerified, setIsAuthVerified] = useState(false);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
+
 
   useEffect(() => {
     // Run auth verification only if not on the login page
@@ -38,12 +40,16 @@ function App() {
           if (!data.valid) {
             alert(`Session expired. Please log in again.\n(${data.error})`);
             navigate('/login');
+            setIsAuthVerified(false);
           } else {
             setIsAuthVerified(true);
           }
         } catch (error) {
           alert(`Failed to verify authentication: ${error}`);
           navigate('/login');
+          setIsAuthVerified(false);
+        } finally {
+          setIsAuthLoading(false);
         }
       };
 
@@ -58,19 +64,20 @@ function App() {
       return () => clearInterval(intervalId);
       
 
-    }
+    } else {setIsAuthLoading(false)}
+    
   }, [location.pathname, navigate]);
-  
-  
-  // Prevent rendering pages until authentication is verified
+
+  if (isAuthLoading && hideNav) {
+    return <LoadingAnimated />;
+  }
 
   return (
     <>
-    
       {!hideNav && isAuthVerified && <NavigationBar/>}
       <Routes>
           <Route path="/login" element={<Login />} />
-          {isAuthVerified && location.pathname !== '/login' ? 
+          {isAuthVerified ? 
             <>
               <Route path="/" element={<Dashboard />} />
               <Route path="/categories" element={<Categories />} />
@@ -81,7 +88,6 @@ function App() {
             </> 
             :<></> }
       </Routes>
-      {!isAuthVerified && location.pathname !== '/login' && <LoadingAnimated/>}
     </>
   )
 }
