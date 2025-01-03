@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from google.oauth2 import id_token
 from google.auth.transport import requests
 import pandas as pd
+import json
 
 
 app = Flask(__name__)
@@ -136,24 +137,47 @@ class Secure(Resource):
     def delete(self):
         ...
 
-@api.route('/record_data')
+@api.route('/record_data', '/record_data/<int:count>')
 class RecordData(Resource):
-    def get(self):
-        ...
-    def post(self):
-        file = request.files['file']
-        auth_data = get_auth_data()
-        if not auth_data[0]['valid']:
-            raise auth_data[0]['error']
-        else:
-            userID = auth_data[0]['user']
-
-        if 'file' not in request.files:
-            return {'error': 'No file part'}, 400
-        if file.filename == '':
-            return {'error': 'No selected file'}, 400
-
+    def get(self, count=0):
         try:
+            auth_data = get_auth_data()
+            if not auth_data[0]['valid']:
+                raise auth_data[0]['error']
+            else:
+                userID = auth_data[0]['user']
+
+            curr = get_db()
+            curr.execute("""select transactionID, categoryID, type, details, particulars, code, reference, amount, Transactions.date
+                         From Transactions
+                         Inner Join Upload on Upload.uploadID = Transactions.uploadID
+                         Where userID = ?
+                         Order By JULIANDAY(Transactions.date) DESC
+                         Limit 50 OFFSET ?""", (userID,count))
+            data = curr.fetchall()
+
+            columns = [column[0] for column in curr.description]  # Get column names
+            result = [dict(zip(columns, row)) for row in data]
+
+            return {"data":result}, 200
+        except Exception as e:
+            return {'error': str(e)}, 500
+
+    def post(self):
+        try:
+            file = request.files['file']
+            auth_data = get_auth_data()
+            if not auth_data[0]['valid']:
+                raise auth_data[0]['error']
+            else:
+                userID = auth_data[0]['user']
+
+            if 'file' not in request.files:
+                return {'error': 'No file part'}, 400
+            if file.filename == '':
+                return {'error': 'No selected file'}, 400
+
+       
             if file.filename.endswith('.csv'):
                 df = pd.read_csv(file)
             elif file.filename.endswith('.xlsx'):
