@@ -1,4 +1,4 @@
-#vertical-scroll-carousel {
+#transaction-carousel {
   position: relative;
   width: 300px; /* Fixed width for the carousel */
   max-height: 85vh; /* Adjust height to control how many cards are visible */
@@ -41,6 +41,11 @@
   }
   .carousel-card-algin-right {
     margin: 5px;
+    text-align: right;
+
+    .transaction-card-icon {
+      font-size: 10px;
+    }
   }
 
 }
