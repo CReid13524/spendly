@@ -1,16 +1,28 @@
-import React from 'react'
+import React, { useState } from 'react'
 import DashboardChart from '../components/dashboardChart'
-import CardCarousel from '../components/cardCarousel'
+import DashboardCarousel from '../components/dashboardCarousel'
 import PageHeader from '../components/pageHeader'
 
 function dashboard() {
+  const [headerEnabled, setHeaderEnabled] = useState(true)
+  const [refreshOnState, setRefreshOnState] = useState(false)
+
+  function test() {
+    setHeaderEnabled(!headerEnabled)
+  }
+
+  async function onCarouselChange() {
+    await new Promise(resolve => setTimeout(resolve, 100));
+    setRefreshOnState(!refreshOnState)
+  }
+
   return (
     <div id='dashboard-container'>
-      <div id='portal'></div>
+      <div id='transactionModalPortal'></div>
       <div id='dashboard-page'>
-        <PageHeader/>
-        <DashboardChart/>
-        <CardCarousel/>
+        {headerEnabled ? <PageHeader/> : <></>}
+        <DashboardChart refreshOnState={refreshOnState}/>
+        <DashboardCarousel headerToggle={test} onChange={onCarouselChange}/>
       </div>
     </div>
   )

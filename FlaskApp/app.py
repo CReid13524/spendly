@@ -137,9 +137,9 @@ class Secure(Resource):
     def delete(self):
         ...
 
-@api.route('/record_data', '/record_data/<int:count>')
+@api.route('/record_data', '/record_data/<int:count>/<string:categoryID>', '/record_data/<int:count>')
 class RecordData(Resource):
-    def get(self, count=0):
+    def get(self, count=0, categoryID=None):
         try:
             auth_data = get_auth_data()
             if not auth_data[0]['valid']:
@@ -147,11 +147,15 @@ class RecordData(Resource):
             else:
                 userID = auth_data[0]['user']
 
+            category_filter = ''
+            if categoryID:
+                category_filter = f'AND categoryID={categoryID}'
+
             curr = get_db()
-            curr.execute("""select transactionID, categoryID, type, details, particulars, code, reference, amount, Transactions.date
+            curr.execute(f"""select transactionID, categoryID, type, details, particulars, code, reference, amount, Transactions.date
                          From Transactions
                          Inner Join Upload on Upload.uploadID = Transactions.uploadID
-                         Where userID = ?
+                         Where userID = ? {category_filter}
                          Order By JULIANDAY(Transactions.date) DESC
                          Limit 50 OFFSET ?""", (userID,count))
             data = curr.fetchall()
@@ -204,9 +208,125 @@ class RecordData(Resource):
             return {'error': str(e)}, 500
         
     def put(self):
-        ...
+        try:
+            auth_data = get_auth_data()
+            if not auth_data[0]['valid']:
+                raise auth_data[0]['error']
+
+            data = request.get_json()
+
+            curr = get_db()
+            curr.execute("""Update Transactions
+                            Set categoryID = ?
+                            Where transactionID = ?""",(data['categoryID'],data['transactionID']))
+
+            curr.connection.commit()
+
+            return {}, 200
+        except Exception as e:
+            return {'error': str(e)}, 500
     def delete(self):
-        ...
+        try:
+            auth_data = get_auth_data()
+            if not auth_data[0]['valid']:
+                raise auth_data[0]['error']
+
+            data = request.get_json()
+
+            curr = get_db()
+            curr.execute("""Delete from Transactions
+                            Where transactionID = ?""",(data['transactionID'],))
+
+            curr.connection.commit()
+
+            return {}, 200
+        except Exception as e:
+            return {'error': str(e)}, 500
+           
+
+@api.route('/categories','/categories/<string:advanced>')
+class Categories(Resource):
+    def get(self,advanced=False):
+        try:
+            advanced = bool(advanced)
+            auth_data = get_auth_data()
+            if not auth_data[0]['valid']:
+                raise auth_data[0]['error']
+            else:
+                userID = auth_data[0]['user']
+
+            curr = get_db()
+            if advanced:
+                curr.execute("""with transData as (
+                                    Select Category.categoryID, IFNULL(SUM(amount),0.0) amount
+                                    from Category
+                                    LEFT JOIN Transactions on Transactions.categoryID = Category.categoryID
+                                    Group by Category.categoryID
+                                )
+
+                                Select  Category.categoryID, name, colour, icon, transData.amount from Category
+                                JOIN transData on transData.categoryID = Category.categoryID
+                                Where userID=?""",(userID,))
+            else:
+                curr.execute("""Select  categoryID, name, colour, icon from Category
+                                where userID=?""", (userID,))
+            data = curr.fetchall()
+
+            columns = [column[0] for column in curr.description]
+            result = [dict(zip(columns, row)) for row in data]
+
+            return {"data":result}, 200
+        except Exception as e:
+            return {'error': str(e)}, 500
+    def post(self):
+        try:
+            auth_data = get_auth_data()
+            if not auth_data[0]['valid']:
+                raise auth_data[0]['error']
+            else:
+                userID = auth_data[0]['user']
+            data = request.get_json()
+
+            curr = get_db()
+            curr.execute("Insert into Category(userID, name, colour, icon) VALUES (?,?,?,?)",
+                         (userID,data['name'],data['color'],data['icon']))
+            curr.connection.commit()
+
+            return {}, 200
+        except Exception as e:
+            return {'error': str(e)}, 500
+    def put(self):
+        try:
+            auth_data = get_auth_data()
+            if not auth_data[0]['valid']:
+                raise auth_data[0]['error']
+            data = request.get_json()
+
+            curr = get_db()
+            curr.execute("""Update Category set name=?, colour=?, icon=?
+                            Where categoryID = ?""",
+                         (data['name'],data['color'],data['icon'],data['categoryID']))
+            curr.connection.commit()
+
+            return {}, 200
+        except Exception as e:
+            return {'error': str(e)}, 500
+    def delete(self):
+        try:
+            auth_data = get_auth_data()
+            if not auth_data[0]['valid']:
+                raise auth_data[0]['error']
+            data = request.get_json()
+
+            curr = get_db()
+            curr.execute("""Delete from Category 
+                            Where categoryID=?""", (data['categoryID'],))
+            curr.connection.commit()
+
+            return {}, 200
+        except Exception as e:
+            return {'error': str(e)}, 500
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000, host='0.0.0.0')
