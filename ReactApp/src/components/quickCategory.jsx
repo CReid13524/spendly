@@ -129,7 +129,7 @@ function QuickCategory({ headerToggle}) {
             <div id='quick-select-buttons'>
                 <button onClick={() => setIsAuto((e) => !e)} style={{color: isAuto ? '#3080d0af' : ''}}>Auto</button>
                 <div id='change-select-buttons'>
-                    <IoChevronBackCircle onClick={() => {if (selectedCardIndex !== 0) setSelectedCardIndex((e) => e-11)}}/>
+                    <IoChevronBackCircle onClick={() => {if (selectedCardIndex !== 0) setSelectedCardIndex((e) => e-1)}}/>
                     <IoChevronForwardCircle onClick={() => {if (selectedCardIndex !== cardData.length-1) setSelectedCardIndex((e) => e+1)}}/>
                 </div>
             </div>
