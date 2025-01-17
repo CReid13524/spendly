@@ -387,15 +387,75 @@ html, body {
         height: 100%;
         box-sizing: border-box;
 
-        #page-title {
-            margin: 15px;
-            font-weight:bold;
+        #page-heading {
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+          align-items: center;
+
+          button {
+            all: unset;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            color: #3080d0;
+
+            svg {
+              width: 20px;
+              height: auto;
+            }
+          }
+          button:hover {
+            color: #3080d0af
+          }
+
+          #page-title {
+              margin: 15px;
+              font-weight:bold;
+          }
         }
 
         #emoji-picker {
             align-self: center;
             
           }
+
+        #quick-category-select {
+        position: relative;
+        width: 300px;  
+        background-color: #f0f0f0;
+        border-radius: 10px;
+        margin-top: 20px;
+        margin-bottom: 70px;
+        align-self: center;
+        align-items: center;
+
+        #quick-select-buttons {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          margin-bottom: 20px;
+          margin-top: 10px;
+
+          button {
+            all: unset;
+            color: #3080d0;
+            margin-bottom: 5px;
+          }
+          button:hover {
+            color: #3080d0af
+          }
+          #change-select-buttons {
+            display: flex;
+            gap: 10px;
+            svg {
+              height: auto;
+              width: 30px;
+            }
+          }
+        }
+      }
     }
 }
 
@@ -479,7 +539,7 @@ html, body {
             display: flex;
             flex-direction: row;
             align-items: center;
-            gap: 0.5em;
+            gap: 0.5rem;
             justify-content: space-between;
 
             .color-select {

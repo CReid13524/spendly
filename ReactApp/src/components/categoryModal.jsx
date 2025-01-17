@@ -12,7 +12,6 @@ function CategoryModal({open, categoryData, onClose, handleError, onUpdate}) {
     const [cardData, setCardData] = useState([])
     const [categoryUpdatePending, setCategoryUpdatePending] = useState(null)
     const [nameEditActive, setNameEditActive] = useState(false)
-    const [isExiting, setIsExiting] = useState(false)
     const [selectColor, setSelectColor] = useState(categoryData.colour)
     const [selectName, setSelectName] = useState(categoryData.name)
     const [selectIcon, setSelectIcon] = useState(categoryData.icon)
@@ -138,7 +137,7 @@ All existing transaction will be unset.`))
 
     if (!open) return null
     return ReactDOM.createPortal(
-        <div className={`category-modal-container ${isExiting ? 'slide-out' : 'slide-in'}`}>
+        <div className='category-modal-container'>
           <EmojiPickerModal open={emojiModalOpen} onSelect={e => setSelectIcon(e)} onClose={handleEmojiPickerClose}/>
             <div className='category-modal'>
                 <div className='category-title' style={{backgroundColor:selectColor+'99'}}>

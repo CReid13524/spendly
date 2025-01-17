@@ -3,7 +3,8 @@ import TransactionModal from './transactionModal'
 import { LuCircleDashed } from "react-icons/lu";
 
 function TransactionCard({ data, onClick, onClose, handleDelete, handleCategoryUpdate, categoryData, staticColor}) {
-    const [isModalOpen, setIsModalOpen] = useState(false)
+  if (!data) return null  
+  const [isModalOpen, setIsModalOpen] = useState(false)
     const [modalData, setModalData] = useState(null)
 
     function handleClick() {
@@ -16,10 +17,11 @@ function TransactionCard({ data, onClick, onClose, handleDelete, handleCategoryU
         setIsModalOpen(false)
         onClose()
     }
-
+    console.log(data, categoryData)
     const categoryObject = categoryData.find((category) => (category.categoryID === data.categoryID))
     const backgroundColor = categoryObject ? categoryObject.colour+'99' : ''
     const icon = categoryObject && categoryObject.icon ? categoryObject.icon : <LuCircleDashed/>
+    
     
     return (
         <>
