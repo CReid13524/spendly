@@ -149,7 +149,7 @@ class RecordData(Resource):
 
             category_filter = ''
             if categoryID:
-                category_filter = f'AND categoryID={categoryID}'
+                category_filter = f'AND categoryID {'is NULL' if categoryID=='null' else f'= {categoryID}'} '
 
             curr = get_db()
             curr.execute(f"""select transactionID, categoryID, type, details, particulars, code, reference, amount, Transactions.date
