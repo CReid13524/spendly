@@ -6,11 +6,11 @@ function settings() {
   
   return (
     <div id='settings-container'>
-    <div id='settings-page'>
-      <PageHeader/>
-      <div id="page-title">Settings</div>
-      <UploadCSV/>
-    </div>
+      <div id='settings-page'>
+        <PageHeader/>
+        <div id="page-title">Settings</div>
+        <UploadCSV/>
+      </div>
     </div>
 
   )
