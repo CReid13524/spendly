@@ -17,7 +17,7 @@ function TransactionCard({ data, onClick, onClose, handleDelete, handleCategoryU
         setIsModalOpen(false)
         onClose()
     }
-    console.log(data, categoryData)
+
     const categoryObject = categoryData.find((category) => (category.categoryID === data.categoryID))
     const backgroundColor = categoryObject ? categoryObject.colour+'99' : ''
     const icon = categoryObject && categoryObject.icon ? categoryObject.icon : <LuCircleDashed/>
