@@ -32,7 +32,7 @@ function TransactionCard({ data, onClick, onClose, handleDelete, handleCategoryU
             <div className="date">{data.date}</div>
           </div>
           <div className="carousel-card-algin-right">
-            <div>{data.amount >= 0 ? '$' : '-$'}{Math.abs(data.amount).toFixed(2)}</div>
+            <div>{data.amount}</div>
             <div className='transaction-card-icon'>{icon}</div>
           </div>
         </div>

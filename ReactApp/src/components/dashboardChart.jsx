@@ -8,6 +8,11 @@ const DashboardChart = ({refreshOnState}) => {
   const chartInstance = useRef(null);
   const incomeButtonRef = useRef(null);
   const categoriesButtonRef = useRef(null);
+  const categoryDataRef = useRef([])
+
+  useEffect(() => {
+    categoryDataRef.current = categoryData
+  },[categoryData])
 
   useEffect(() => {
   async function getCategoryData() {
@@ -18,7 +23,8 @@ const DashboardChart = ({refreshOnState}) => {
       if (!response.ok) {
           throw data.error
       } else {
-        setCategoryData(data.data.filter(e => e.amount < 0))
+        console.log()
+        setCategoryData(data.data.filter(e => e.amount.includes('-')))
       
       }
     } catch (error) {
@@ -37,10 +43,9 @@ const DashboardChart = ({refreshOnState}) => {
 
   useEffect(() => {
 
-    const data = categoryData.map((e) => e.amount)
+    const data = categoryData.map((e) => Number(e.amount.split('$')[1]))
     const labels = categoryData.map((e) => e.name)
     const backgroundColors = categoryData.map((e) => e.colour)
-
     const ctx = chartRef.current.getContext('2d');
 
     if (!chartInstance.current) {
@@ -77,8 +82,7 @@ const DashboardChart = ({refreshOnState}) => {
             tooltip: {  
               callbacks: {
                 label: function(tooltipItem) {
-                  // Customize tooltip labels if necessary
-                  return ` ${tooltipItem.raw >= 0 ? '$' : '-$'}${Math.abs(tooltipItem.raw).toFixed(2)}`;
+                  return ` ${categoryDataRef.current[tooltipItem.dataIndex]?.amount}`;
                 },
               },
             },

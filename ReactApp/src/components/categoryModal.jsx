@@ -161,7 +161,7 @@ All existing transaction will be unset.`))
                         
                     </div>
                     <div className='title-amount'>
-                    {categoryData.amount >= 0 ? '$' : '-$'}{Math.abs(categoryData.amount).toFixed(2)}
+                    {categoryData.amount}
                     </div>
                 </div>
                 

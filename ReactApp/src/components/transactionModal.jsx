@@ -79,7 +79,7 @@ function TransactionModal({open, transactionData, onClose, handleDelete, handleC
                         <MdDelete onClick={handleDeleteClose}/>
                     </div>
                     <div className='title-amount'>
-                        {transactionData.amount >= 0 ? '$' : '-$'}{Math.abs(transactionData.amount).toFixed(2)}
+                        {transactionData.amount}
                     </div>
                 </div>
                 <Select options={selectOptions} closeMenuOnSelect noOptionsMessage={"Go to 'Categories' page to make some new Categories!"}
