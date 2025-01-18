@@ -163,6 +163,9 @@ class RecordData(Resource):
             columns = [column[0] for column in curr.description]  # Get column names
             result = [dict(zip(columns, row)) for row in data]
 
+            for x in result:
+                x['amount'] = f"{'-$' if x['amount']<0 else '$'}{abs(x['amount']):.2f}"
+            
             return {"data":result}, 200
         except Exception as e:
             return {'error': str(e)}, 500
@@ -274,6 +277,11 @@ class Categories(Resource):
 
             columns = [column[0] for column in curr.description]
             result = [dict(zip(columns, row)) for row in data]
+            
+
+            if advanced:
+                for x in result:
+                    x['amount'] = f"{'-$' if x['amount']<0 else '$'}{abs(x['amount']):.2f}"
 
             return {"data":result}, 200
         except Exception as e:
