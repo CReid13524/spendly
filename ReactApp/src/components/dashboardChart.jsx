@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import Chart from 'chart.js/auto';
+import { AiOutlinePlus } from "react-icons/ai";
 
 const DashboardChart = ({refreshOnState}) => {
   const chartRef = useRef(null);
@@ -53,7 +54,7 @@ const DashboardChart = ({refreshOnState}) => {
       chartInstance.current = new Chart(ctx, {
         type: 'doughnut',
         data: {
-          labels: [...labels,'Income'],
+          labels: labels,
           datasets: [
             { 
               label: 'Spending',
@@ -65,8 +66,8 @@ const DashboardChart = ({refreshOnState}) => {
             },
             { 
               label: 'Income',
-              data: [...data,200],
-              backgroundColor: [...backgroundColors,'#44b60f'],
+              data: data,
+              backgroundColor: categoryData.map((e) => e.isIncome ? '#44b60f' : e.colour),
               borderColor: 'white',
               borderWidth: 2,
               hoverOffset: 10,
@@ -81,27 +82,44 @@ const DashboardChart = ({refreshOnState}) => {
             },
             tooltip: {  
               callbacks: {
-                label: function(tooltipItem) {
-                  return ` ${categoryDataRef.current[tooltipItem.dataIndex]?.amount}`;
+                label: function (tooltipItem) {
+                  const dataPoint = categoryDataRef.current[tooltipItem.dataIndex];
+                  const amount = dataPoint.amount;
+                  return ` ${amount}`;
+                },
+                afterLabel: function (tooltipItem) {
+                  const dataPoint = categoryDataRef.current[tooltipItem.dataIndex];
+                  const isIncomeTag = dataPoint?.isIncome ? '(Income)' : '';
+                  if (tooltipItem.datasetIndex === 1) {
+                    return `${isIncomeTag}`;
+                  }
+                  return ''; // Return empty string if not in dataset 1
+                },
+                title: function (tooltipItems) {
+                  const tooltipItem = tooltipItems[0]; 
+                  const dataPoint = categoryDataRef.current[tooltipItem.dataIndex];
+                  const icon = dataPoint?.icon || '⚪'; 
+                  return `${tooltipItem.label} ${icon}`;
                 },
               },
             },
+          },
           animation: {
             animateScale: true,
             animateRotate: true,
           },
           maintainAspectRatio: false,
-          },
-        }
+        },
       });
+      
       toggleDatasetVisibility(chartInstance.current,1)
     } else {
       // Update the chart data
       chartInstance.current.data.labels = [...labels, 'Income'];
       chartInstance.current.data.datasets[0].data = data;
-      chartInstance.current.data.datasets[1].data = [...data, 200];
+      chartInstance.current.data.datasets[1].data = data;
       chartInstance.current.data.datasets[0].backgroundColor = [...backgroundColors];
-      chartInstance.current.data.datasets[1].backgroundColor = [...backgroundColors, '#44b60f'];
+      chartInstance.current.data.datasets[1].backgroundColor = categoryData.map((e) => e.isIncome ? '#44b60f' : e.colour);
       chartInstance.current.options.animation = {
         duration: 1000, // Short animation for update
       };
