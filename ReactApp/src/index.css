@@ -479,14 +479,22 @@ html, body {
       }
   
       .category-title {
-        display: flex;
+        display: grid;
         flex-direction: column;
         background-color: #8FCEFE;
         align-items: center;
         padding-bottom: 15px;
+
+        .income-check {
+          display: flex;
+          font-size: 12px;
+          align-items: center;
+          justify-self:end ;
+        }
   
         .title-amount {
-          margin-top: 20px;
+          justify-self: center;
+          margin-top: 10px;
           font-weight: 600;
           font-size: 24px;
         }
@@ -600,4 +608,6 @@ html, body {
     transform: translate(-50%, -50%);
     text-align: center;
   }
+
+
 }

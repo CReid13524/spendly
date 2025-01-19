@@ -11,14 +11,16 @@ import { MdDelete } from "react-icons/md";
 function CategoryModal({open, categoryData, onClose, handleError, onUpdate}) {
     const [cardData, setCardData] = useState([])
     const [categoryUpdatePending, setCategoryUpdatePending] = useState(null)
-    const [nameEditActive, setNameEditActive] = useState(false)
+    const [editActive, setEditActive] = useState(false)
     const [selectColor, setSelectColor] = useState(categoryData.colour)
+    const [selectIncome, setSelectIncome] = useState(categoryData.isIncome)
     const [selectName, setSelectName] = useState(categoryData.name)
     const [selectIcon, setSelectIcon] = useState(categoryData.icon)
     const [emojiModalOpen, setEmojiModalOpen] = useState(false)
     const [limitText, setLimitText] = useState('')
     const cardDataRef = useRef(cardData);
     const inputRef = useRef(null);
+    
     async function getTransactionData() {
         
         try {
@@ -36,7 +38,6 @@ function CategoryModal({open, categoryData, onClose, handleError, onUpdate}) {
           handleError(error)
         }
       }
-    
       useEffect(() => {
         getTransactionData()
       },[])
@@ -66,19 +67,18 @@ function CategoryModal({open, categoryData, onClose, handleError, onUpdate}) {
       }
 
       useEffect(() => {
-        if (nameEditActive && inputRef.current) {
+        if (editActive && inputRef.current) {
           inputRef.current.focus();
         }
-      }, [nameEditActive]);
+      }, [editActive]);
 
 
-      async function handleUpdate() {
-        setNameEditActive(false)
+      async function handleUpdate(isIncome=selectIncome) {
         try {
           const response = await fetch('/api/categories', {
             method: 'PUT',
             headers:  {'Content-Type' : 'application/json'},
-            body: JSON.stringify({"categoryID":categoryData.categoryID, 'color':selectColor, 'name':selectName, 'icon':selectIcon})
+            body: JSON.stringify({"categoryID":categoryData.categoryID, 'color':selectColor, 'name':selectName, 'icon':selectIcon, 'isIncome': isIncome ? 1 : 0})
           });
           const data = await response.json();
           if (!response.ok) {
@@ -135,6 +135,13 @@ All existing transaction will be unset.`))
     }
   }
 
+  function handleIsIncome(e) {
+    e.stopPropagation()
+    handleUpdate(!selectIncome)
+    setSelectIncome((e) => !e)
+    
+  }
+
     if (!open) return null
     return ReactDOM.createPortal(
         <div className='category-modal-container'>
@@ -144,22 +151,23 @@ All existing transaction will be unset.`))
                     <div className='title-header'>
                         <div className='title-return'>
                             <MdOutlineArrowBack onClick={onClose}/>
-                            <input disabled={!nameEditActive} value={selectName} onChange={(e) => setSelectName(e.target.value)} ref={inputRef} onBlur={handleUpdate}/>
+                            <input disabled={!editActive} value={selectName} onChange={(e) => setSelectName(e.target.value)} ref={inputRef} onBlur={handleUpdate}/>
                         </div>
                         <div className='header-align-right'>
-                          {nameEditActive ? <AiOutlineEdit onClick={() => setNameEditActive(!nameEditActive)}/> : <AiFillEdit onClick={() => setNameEditActive(!nameEditActive)}/>}
-                          <div style={{backgroundColor:selectColor}} className="color-select">
+                          {editActive ? <AiOutlineEdit onClick={() => setEditActive(!editActive)}/> : <AiFillEdit onClick={() => setEditActive(!editActive)}/>}
+                          { editActive ? <div style={{backgroundColor:selectColor}} className="color-select">
                             <input type='color' value={selectColor} onChange={e => setSelectColor(e.target.value)} onBlur={handleUpdate}/>
-                          </div>
-                          <MdDelete onClick={handleDelete}/>
+                          </div> : null }
+                          {editActive ? <MdDelete onClick={handleDelete}/> : null}
                           <div className='category-icon' onClick={handleToggleEmojiPicker}>
-                          {selectIcon ?  selectIcon : <LuCircleDashed />}
+                            {selectIcon ?  selectIcon : <LuCircleDashed />}
                           </div>
-                          
                         </div>
                         
-                        
                     </div>
+                    {editActive ? <div className='income-check'>Income
+                      <input type='checkbox' checked={selectIncome} onChange={handleIsIncome}/>
+                    </div> : null }
                     <div className='title-amount'>
                     {categoryData.amount}
                     </div>
