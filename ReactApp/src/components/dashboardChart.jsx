@@ -5,6 +5,7 @@ import { AiOutlinePlus } from "react-icons/ai";
 const DashboardChart = ({refreshOnState}) => {
   const chartRef = useRef(null);
   const [categoryData, setCategoryData] = useState([])
+  const hiddenLabels = useRef([])
   const [error, setError] = useState(<></>)
   const chartInstance = useRef(null);
   const incomeButtonRef = useRef(null);
@@ -25,7 +26,7 @@ const DashboardChart = ({refreshOnState}) => {
           throw data.error
       } else {
         console.log()
-        setCategoryData(data.data.filter(e => e.amount.includes('-')))
+        setCategoryData(data.data.filter((e) => Number(e.amount.replace('$',''))))
       
       }
     } catch (error) {
@@ -44,8 +45,9 @@ const DashboardChart = ({refreshOnState}) => {
 
   useEffect(() => {
 
-    const data = categoryData.map((e) => Number(e.amount.split('$')[1]))
-    const labels = categoryData.map((e) => e.name)
+    const data = categoryData.map((e) => Number(e.amount.replace('$','')))
+    const spendingData = data.map((e) => e<0 ? e : 0)
+    const labels = categoryData.map((e) => [e.name, e.icon])
     const backgroundColors = categoryData.map((e) => e.colour)
     const ctx = chartRef.current.getContext('2d');
 
@@ -54,11 +56,11 @@ const DashboardChart = ({refreshOnState}) => {
       chartInstance.current = new Chart(ctx, {
         type: 'doughnut',
         data: {
-          labels: labels,
+          labels: labels[0],
           datasets: [
             { 
               label: 'Spending',
-              data: data,
+              data: spendingData,
               backgroundColor: backgroundColors,
               borderColor: 'white',
               borderWidth: 2,
@@ -78,7 +80,7 @@ const DashboardChart = ({refreshOnState}) => {
           responsive: true,
           plugins: {
             legend: {
-              position: 'top',
+              display: false,
             },
             tooltip: {  
               callbacks: {
@@ -97,9 +99,8 @@ const DashboardChart = ({refreshOnState}) => {
                 },
                 title: function (tooltipItems) {
                   const tooltipItem = tooltipItems[0]; 
-                  const dataPoint = categoryDataRef.current[tooltipItem.dataIndex];
-                  const icon = dataPoint?.icon || '⚪'; 
-                  return `${tooltipItem.label} ${icon}`;
+                  const icon = tooltipItem.label[1] || '⚪'; 
+                  return `${tooltipItem.label[0]} ${icon}`;
                 },
               },
             },
@@ -115,17 +116,58 @@ const DashboardChart = ({refreshOnState}) => {
       toggleDatasetVisibility(chartInstance.current,1)
     } else {
       // Update the chart data
-      chartInstance.current.data.labels = [...labels, 'Income'];
-      chartInstance.current.data.datasets[0].data = data;
+      chartInstance.current.data.labels = labels;
+      chartInstance.current.data.datasets[0].data = spendingData;
       chartInstance.current.data.datasets[1].data = data;
       chartInstance.current.data.datasets[0].backgroundColor = [...backgroundColors];
-      chartInstance.current.data.datasets[1].backgroundColor = categoryData.map((e) => e.isIncome ? '#44b60f' : e.colour);
+      chartInstance.current.data.datasets[1].backgroundColor = categoryData.map((e) => e.isIncome ? '#44b60f' : e.colour)
       chartInstance.current.options.animation = {
         duration: 1000, // Short animation for update
       };
       chartInstance.current.update();
     }
+
+    const customLegendContainer = document.getElementById('custom-legend');
+
+    
+
+    customLegendContainer.innerHTML = legendCallback(chartInstance.current);
+
   }, [categoryData]);
+
+  function strikethroughLegend(labelIndex, addStrike) {
+    const legendElements = document.querySelectorAll('.legend-item');
+    if (addStrike) {
+      legendElements[labelIndex].style.textDecoration = 'line-through'
+    } else {
+      legendElements[labelIndex].style.textDecoration = 'none'
+    }
+  }
+
+
+  function legendCallback(chart) {
+    if (!chart.data.labels) return null
+    const legendItems = chart.data.labels.map((label, index) => {
+      const color = chart.data.datasets[0].backgroundColor[index];
+      const isHidden = hiddenLabels.current.includes(index);
+      return `
+        <div class="legend-item" key=${index}>
+          <span class="legend-label" style="text-decoration:${isHidden ?  'line-through' : ''};">${label[1]}${label[0]}</span>
+          <span class="legend-icon" style="background-color: ${color};"></span>
+        </div>`;
+    });
+
+    setTimeout(() => {
+    const legendElements = document.querySelectorAll('.legend-item');
+    legendElements.forEach((item) => {
+        const index = parseInt(item.getAttribute('key'), 10);
+        item.addEventListener('click', () => toggleLabelVisibility(chart, index));
+      });
+    }, 0);
+
+  
+    return legendItems.join('');
+  }
 
   const toggleDatasetVisibility = (chart, datasetIndex) => {
     if (!chart) return;
@@ -133,6 +175,30 @@ const DashboardChart = ({refreshOnState}) => {
     meta.hidden = !meta.hidden;
     chart.update();
   };
+
+const toggleLabelVisibility = (chart, labelIndex, forceOff=null) => {
+  if (!chart) return;
+
+  // Toggle the visibility of the label
+  if (hiddenLabels.current.includes(labelIndex) && !forceOff) {
+    hiddenLabels.current = hiddenLabels.current.filter((i) => i !== labelIndex)
+    strikethroughLegend(labelIndex, false)
+  } else if (forceOff===null || forceOff) {
+    strikethroughLegend(labelIndex, true)
+    hiddenLabels.current.push(labelIndex, true);
+  }
+
+  // Update the chart to reflect hidden labels
+  chart.data.labels.forEach((label, i) => {
+    const meta = chart.getDatasetMeta(0); // Assuming you're using dataset 0 for this
+    meta.data[i].hidden = hiddenLabels.current.includes(i);
+  });
+
+  // Update the chart to reflect the changes
+  
+  chart.update();
+};
+  
 
   useEffect(() => {
     const incomeButton = incomeButtonRef.current;
@@ -158,15 +224,37 @@ const DashboardChart = ({refreshOnState}) => {
     };
   }, [chartInstance]);
 
+  const animateSpending = async (chart) => {
+    if (!chart) return;
+
+  const datasetMeta = chart.getDatasetMeta(0);
+  datasetMeta.data.forEach((meta, index) => {
+    toggleLabelVisibility(chart, index, true)
+  });
+  datasetMeta.hidden = false;
+
+  const meta = chart.getDatasetMeta(1);
+  meta.hidden = true;
+  chart.update();
+
+  for (let i = 0; i < chart.data.labels.length; i++) {
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    toggleLabelVisibility(chart, i, false)
+    chart.update();
+  }
+  }
+
  
 
   return (
     <>
     {error}
+      <div id="custom-legend"></div>
       <canvas id="dashboard-chart-main" ref={chartRef}></canvas>
       <div className='chart-actions'>
         <button id="toggleIncome" ref={incomeButtonRef} className='chart-action'>Toggle Income</button>
-        <button id="toggleCategories" ref={categoriesButtonRef} className='chart-action'>Toggle Categories</button>
+        <button id="toggleCategories" ref={categoriesButtonRef} className='chart-action'>Toggle Spending</button>
+        <button id="toggleCategories" className='chart-action' onClick={() => animateSpending(chartInstance.current)}>Animate Spending</button>
       </div>
     </>
 )};

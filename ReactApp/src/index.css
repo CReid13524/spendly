@@ -271,6 +271,44 @@ html, body {
             box-sizing: border-box;
             align-items: center;
 
+            #custom-legend {
+              margin-top: 5px;
+              max-height: 100px;
+              width: 300px; 
+              justify-content: center;
+              flex-wrap: wrap;
+              overflow-y: scroll;
+              padding: 10px;
+              background: inherit;
+              display: flex;
+              gap: 10px;
+
+            }
+            
+            .legend-item {
+              display: flex;
+              align-items: center;
+              width: fit-content;
+              flex-direction: column;
+              cursor: pointer;
+            }
+            
+            .legend-icon {
+              width: 100%;
+              height: 3px;
+            }
+
+            .legend-label {
+              max-width: 140px; /* Adjust max-width as needed */
+              white-space: nowrap; /* Prevent wrapping on spaces */
+              overflow: hidden; /* Hide overflow text */
+              text-overflow: ellipsis; /* Add ellipsis for overflow text */
+              color: #828282;
+              font-size: 12px;
+            }
+            
+            
+
             #dashboard-chart-main {
                 max-width: 300px;
                 max-height: 300px;
