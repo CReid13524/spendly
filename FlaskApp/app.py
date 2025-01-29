@@ -254,9 +254,9 @@ class RecordData(Resource):
             return {'error': str(e)}, 500
            
 
-@api.route('/categories','/categories/<string:advanced>')
+@api.route('/categories','/categories/<string:advanced>','/categories/<string:advanced>/<string:date>')
 class Categories(Resource):
-    def get(self,advanced=False):
+    def get(self,advanced=False, date=''):
         try:
             advanced = bool(advanced)
             auth_data = get_auth_data()
@@ -267,10 +267,15 @@ class Categories(Resource):
 
             curr = get_db()
             if advanced:
-                curr.execute("""with transData as (
+                date_filter = ''
+                if date:
+                    date_filter = f"Where strftime('%Y-%m', Transactions.date) = '{date}'"
+
+                curr.execute(f"""with transData as (
                                     Select Category.categoryID, IFNULL(SUM(amount),0.0) amount
                                     from Category
-                                    LEFT JOIN Transactions on Transactions.categoryID = Category.categoryID
+                                    JOIN Transactions on Transactions.categoryID = Category.categoryID
+                                    {date_filter}
                                     Group by Category.categoryID
                                 )
 
