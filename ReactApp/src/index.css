@@ -476,6 +476,7 @@ html, body {
         align-self: center;
         align-items: center;
 
+
         #quick-select-buttons {
           display: flex;
           flex-direction: column;
@@ -491,12 +492,35 @@ html, body {
           button:hover {
             color: #3080d0af
           }
+
+          #function-buttons {
+            display: flex;
+            width: 300px;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+
+            svg {
+              height: auto;
+              width: 20px;
+            }
+
+            svg:hover {
+              opacity: 80%;
+            }
+          }
+
           #change-select-buttons {
             display: flex;
             gap: 10px;
+
             svg {
               height: auto;
               width: 30px;
+            }
+
+            :hover {
+              opacity: 80%;
             }
           }
         }
