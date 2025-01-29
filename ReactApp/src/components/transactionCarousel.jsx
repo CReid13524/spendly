@@ -2,12 +2,13 @@ import React, { useEffect, useRef, useState } from 'react'
 import "./transactionCarousel.css";
 import TransactionCard from "./transactionCard";
 
-function TransactionCarousel({cardDataParam, fetchExcess, onModalClose=() => {}, headerToggle=() => {}, limitText, handleError, staticColor=null, onCategoryUpdate=() => {}}) {
+function TransactionCarousel({cardDataParam, fetchExcess, onModalClose=() => {}, headerToggle=() => {}, limitText, handleError, staticColor=null, onCategoryUpdate=() => {}, dateSpecifyParam=null}) {
   const [cardData, setCardData] = useState([])
   const isFetching = useRef(false);
   const containerRef = useRef(null);
   const [selectedCardID, setSelectedCardID] = useState(null)
   const [categoryData, setCategoryData] = useState([])
+  const dateSpecify = useRef(dateSpecifyParam)
   const cardDataRef = useRef(cardData);
 
     useEffect(() => {
@@ -17,6 +18,12 @@ function TransactionCarousel({cardDataParam, fetchExcess, onModalClose=() => {},
     useEffect(() => {
       setCardData(cardDataParam);
     }, [cardDataParam]);
+    
+
+    useEffect(() => {
+      dateSpecify.current = dateSpecifyParam
+      containerRef.current.scrollTop = 0
+    }, [dateSpecifyParam]);
 
     useEffect(() => {
         const container = containerRef.current;
@@ -25,7 +32,7 @@ function TransactionCarousel({cardDataParam, fetchExcess, onModalClose=() => {},
           const handleScroll = () => {
             if (container.scrollTop + container.clientHeight >= container.scrollHeight - 5 && !isFetching.current) {
               isFetching.current = true
-              if (fetchExcess(isFetching)) {
+              if (fetchExcess(isFetching, dateSpecify.current)) {
                 container.removeEventListener('scroll', handleScroll);
               }
             }

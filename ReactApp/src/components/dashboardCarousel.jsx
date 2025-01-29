@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import TransactionCarousel from "./transactionCarousel";
 
 
-function DashboardCarousel({headerToggle, onChange}) {
+function DashboardCarousel({headerToggle, onChange, dateSpecify}) {
   const [error, setError] = useState(<></>)
   const [cardData, setCardData] = useState([])
   const [limitText, setLimitText] = useState('')
@@ -23,7 +23,7 @@ function DashboardCarousel({headerToggle, onChange}) {
   async function getTransactionData() {
     
     try {
-      const response = await fetch('/api/record_data', {method: 'GET'});
+      const response = await fetch(`/api/record_data${dateSpecify ? '_filter' : ''}/0${dateSpecify ? `/${dateSpecify}` : ''}`, {method: 'GET'});
       const data = await response.json();
       if (!response.ok) {
           throw data.error
@@ -40,11 +40,13 @@ function DashboardCarousel({headerToggle, onChange}) {
 
   useEffect(() => {
     getTransactionData()
-  },[])
+  },[dateSpecify])
 
-  async function fetchExcess(isFetching) {
+  async function fetchExcess(isFetching, dateSpecify) {
     try {
-      const response = await fetch(`/api/record_data/${cardDataRef.current.length}`, {method: 'GET'});
+      
+      const response = await fetch(`/api/record_data${dateSpecify ? '_filter' : ''}/${cardDataRef.current.length}${dateSpecify ? `/${dateSpecify}` : ''}`, {method: 'GET'});
+      
       const data = await response.json();
       if (!response.ok) {
           throw data.error
@@ -71,7 +73,7 @@ function DashboardCarousel({headerToggle, onChange}) {
   return (
     <>
     {error}
-    <TransactionCarousel cardDataParam={cardData} fetchExcess={fetchExcess} onModalClose={onChange} headerToggle={headerToggle} limitText={limitText} handleError={handleError}/>
+    <TransactionCarousel cardDataParam={cardData} fetchExcess={fetchExcess} onModalClose={onChange} headerToggle={headerToggle} limitText={limitText} handleError={handleError} dateSpecifyParam={dateSpecify}/>
     </>
   );
 

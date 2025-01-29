@@ -271,6 +271,23 @@ html, body {
             box-sizing: border-box;
             align-items: center;
 
+            #date-select {
+              display: flex;
+              flex-direction: row;
+              align-items: center;
+              gap: 2px;
+
+              svg {
+                height: auto;
+                width: 25px;
+              }
+
+              input {
+                border: none;
+                background: inherit;
+              }
+            }
+
             #custom-legend {
               margin-top: 5px;
               max-height: 100px;
