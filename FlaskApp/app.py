@@ -137,9 +137,9 @@ class Secure(Resource):
     def delete(self):
         ...
 
-@api.route('/record_data', '/record_data/<int:count>/<string:categoryID>', '/record_data/<int:count>')
+@api.route('/record_data', '/record_data/<int:count>/<string:categoryID>', '/record_data/<int:count>','/record_data_filter/<int:count>/<string:date>')
 class RecordData(Resource):
-    def get(self, count=0, categoryID=None):
+    def get(self, count=0, categoryID=None, date=None):
         try:
             auth_data = get_auth_data()
             if not auth_data[0]['valid']:
@@ -151,11 +151,15 @@ class RecordData(Resource):
             if categoryID:
                 category_filter = f'AND categoryID {'is NULL' if categoryID=='null' else f'= {categoryID}'} '
 
+            date_filter = ''
+            if date:
+                date_filter = f"AND strftime('%Y-%m', Transactions.date) = '{date}'"
+
             curr = get_db()
             curr.execute(f"""select transactionID, categoryID, type, details, particulars, code, reference, amount, Transactions.date
                          From Transactions
                          Inner Join Upload on Upload.uploadID = Transactions.uploadID
-                         Where userID = ? {category_filter}
+                         Where userID = ? {category_filter} {date_filter}
                          Order By JULIANDAY(Transactions.date) DESC
                          Limit 50 OFFSET ?""", (userID,count))
             data = curr.fetchall()
@@ -200,7 +204,10 @@ class RecordData(Resource):
             
             #Apply uploadID
             df['uploadID'] = uploadID
-            
+
+            #Apply Date Formatting
+            df['date'] = pd.to_datetime(df['date'], format='%d/%m/%Y', errors='coerce').dt.strftime('%Y-%m-%d')
+
             #Insert Data
             df.to_sql('Transactions', conn, if_exists='append', index=False)
             conn.commit()
@@ -267,7 +274,7 @@ class Categories(Resource):
                                     Group by Category.categoryID
                                 )
 
-                                Select  Category.categoryID, name, colour, icon, transData.amount from Category
+                                Select  Category.categoryID, name, colour, icon, transData.amount, isIncome from Category
                                 JOIN transData on transData.categoryID = Category.categoryID
                                 Where userID=?""",(userID,))
             else:
@@ -282,6 +289,7 @@ class Categories(Resource):
             if advanced:
                 for x in result:
                     x['amount'] = f"{'-$' if x['amount']<0 else '$'}{abs(x['amount']):.2f}"
+                    x['isIncome'] = bool(x['isIncome'])
 
             return {"data":result}, 200
         except Exception as e:
@@ -311,9 +319,9 @@ class Categories(Resource):
             data = request.get_json()
 
             curr = get_db()
-            curr.execute("""Update Category set name=?, colour=?, icon=?
+            curr.execute("""Update Category set name=?, colour=?, icon=?, isIncome=?
                             Where categoryID = ?""",
-                         (data['name'],data['color'],data['icon'],data['categoryID']))
+                         (data['name'],data['color'],data['icon'],data['isIncome'], data['categoryID']))
             curr.connection.commit()
 
             return {}, 200
