@@ -240,6 +240,9 @@ const toggleLabelVisibility = (chart, labelIndex, forceOff=null) => {
   for (let i = 0; i < chart.data.labels.length; i++) {
     await new Promise((resolve) => setTimeout(resolve, 1500));
     toggleLabelVisibility(chart, i, false)
+    chart.tooltip.setActiveElements(
+        [{ datasetIndex: 0, index: i }]
+      );
     chart.update();
   }
   }
