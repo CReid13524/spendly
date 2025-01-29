@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import Chart from 'chart.js/auto';
 import { AiOutlinePlus } from "react-icons/ai";
 
-const DashboardChart = ({refreshOnState}) => {
+const DashboardChart = ({refreshOnState, dateSpecify}) => {
   const chartRef = useRef(null);
   const [categoryData, setCategoryData] = useState([])
   const hiddenLabels = useRef([])
@@ -20,7 +20,7 @@ const DashboardChart = ({refreshOnState}) => {
   async function getCategoryData() {
     
     try {
-      const response = await fetch('/api/categories/advanced', {method: 'GET'});
+      const response = await fetch(`/api/categories/advanced${dateSpecify ? `/${dateSpecify}` : ''}`, {method: 'GET'});
       const data = await response.json();
       if (!response.ok) {
           throw data.error
@@ -40,7 +40,7 @@ const DashboardChart = ({refreshOnState}) => {
     }
   }
   getCategoryData()
-},[refreshOnState])
+},[refreshOnState, dateSpecify])
 
 
   useEffect(() => {
