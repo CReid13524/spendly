@@ -9,6 +9,7 @@ function settings() {
       <div id='settings-page'>
         <PageHeader/>
         <div id="page-title">Settings</div>
+        <div id="page-section">Transaction Data</div>
         <UploadCSV/>
       </div>
     </div>

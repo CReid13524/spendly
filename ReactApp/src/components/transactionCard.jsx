@@ -28,7 +28,7 @@ function TransactionCard({ data, onClick, onClose, handleDelete, handleCategoryU
         <TransactionModal transactionData={modalData} open={isModalOpen} onClose={handleClose} handleDelete={handleDelete} handleCategoryUpdate={handleCategoryUpdate} categoryData={categoryData}/>
         <div style={{backgroundColor: staticColor ? staticColor+'99' : backgroundColor}} className="carousel-card" onClick={handleClick}>
           <div className="carousel-card-algin-left">
-            <div>{data.type.includes('Visa')||data.type.includes('Transfer') ? data.code : data.details}</div>
+            <div>{data.title}</div>
             <div className="date">{data.date}</div>
           </div>
           <div className="carousel-card-algin-right">

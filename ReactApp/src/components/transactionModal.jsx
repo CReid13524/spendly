@@ -9,7 +9,7 @@ function TransactionModal({open, transactionData, onClose, handleDelete, handleC
     const [isLoading, setIsLoading] = useState(false)
     const [selectedOption, setSelectedOption] = useState(null)
     if (open) {
-    const [day, month, year] = transactionData.date.split('/'); // Split the input string
+    const [year, month, day] = transactionData.date.split('-'); // Split the input string
     const date = new Date(year, month - 1, day); // Create a Date object
     const options = { weekday: 'long', day: 'numeric', month: 'short' };
     var dateString = date.toLocaleDateString('en-US', options)}
@@ -74,7 +74,7 @@ function TransactionModal({open, transactionData, onClose, handleDelete, handleC
                     <div className='title-header'>
                         <div className='title-return'>
                             <MdOutlineArrowBack onClick={onClose}/>
-                            {transactionData.type.includes('Visa')||transactionData.type.includes('Transfer') ? transactionData.code : transactionData.details}
+                            {transactionData.title}
                         </div>
                         <MdDelete onClick={handleDeleteClose}/>
                     </div>
