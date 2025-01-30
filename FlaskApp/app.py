@@ -156,7 +156,7 @@ class RecordData(Resource):
                 date_filter = f"AND strftime('%Y-%m', Transactions.date) = '{date}'"
 
             curr = get_db()
-            curr.execute(f"""select transactionID, categoryID, type, details, particulars, code, reference, amount, Transactions.date
+            curr.execute(f"""select transactionID, title, categoryID, type, details, particulars, code, reference, amount, Transactions.date
                          From Transactions
                          Inner Join Upload on Upload.uploadID = Transactions.uploadID
                          Where userID = ? {category_filter} {date_filter}
@@ -187,7 +187,8 @@ class RecordData(Resource):
                 return {'error': 'No file part'}, 400
             if file.filename == '':
                 return {'error': 'No selected file'}, 400
-
+            
+            data = json.loads(request.form['data'])
        
             if file.filename.endswith('.csv'):
                 df = pd.read_csv(file)
@@ -204,9 +205,56 @@ class RecordData(Resource):
             
             #Apply uploadID
             df['uploadID'] = uploadID
+            
+            # Handle ANZ CSV
+            if data['bank'] == 'anz':
+                df.rename(columns={
+                    'Type': 'type',
+                    'Details': 'details',
+                    'Particulars': 'particulars',
+                    'Code': 'code',
+                    'Reference': 'reference',
+                    'Amount': 'amount',
+                    'Date': 'date'
+                }, inplace=True)
+                
+                df['title'] = df.apply(lambda row: row['code'] if 'Visa' in row['type'] or 'Transfer' in row['type'] else row['details'], axis=1)
+                
+                df = df.drop(columns=['ForeignCurrencyAmount', 'ConversionCharge'])
+                
+                #Apply Date Formatting
+                df['date'] = pd.to_datetime(df['date'], format='%d/%m/%Y', errors='coerce').dt.strftime('%Y-%m-%d')
 
-            #Apply Date Formatting
-            df['date'] = pd.to_datetime(df['date'], format='%d/%m/%Y', errors='coerce').dt.strftime('%Y-%m-%d')
+            # Handle Kiwibank 'FULL CSV'
+            elif data['bank'] == 'kiwibank':
+                df.rename(columns={
+                    'Source Code (payment type)': 'type',
+                    'Memo/Description': 'details',
+                    'TP part': 'tp_part',
+                    'TP code': 'tp_code',
+                    'TP ref': 'tp_ref',
+                    'OP ref': 'op_ref',
+                    'OP part': 'op_part',
+                    'OP code': 'op_code',
+                    'Amount': 'amount',
+                    'Date': 'date'
+                }, inplace=True)
+                df['title'] = None
+                
+                # Combine TP and OP references into a single 'reference' column
+                df['reference'] = df.apply(lambda row: f"(TP) {row['tp_ref']} (OP) {row['op_ref']}" if not pd.isna(row['tp_ref']) else '', axis=1)
+                df['code'] = df.apply(lambda row: f"(TP) {row['tp_code']} (OP) {row['op_code']}" if not pd.isna(row['tp_code']) else '', axis=1)
+                df['particulars'] = df.apply(lambda row: f"(TP) {row['tp_part']} (OP) {row['op_part']}" if not pd.isna(row['tp_part']) else '', axis=1)
+                
+                # Split 'Memo/Description' column on semicolon into 'details' and 'code'
+                df[['title', 'details']] = df['details'].str.split(';', n=1, expand=True)
+
+                    
+
+                df = df.drop(columns=['Account number', 'tp_part', 'tp_code', 'tp_ref', 'op_ref', 'op_part', 'op_code', 'OP name', 'OP Bank Account Number', 'Amount (credit)', 'Amount (debit)', 'Balance'])
+
+                #Apply Date Formatting
+                df['date'] = pd.to_datetime(df['date'], format='%d-%m-%Y', errors='coerce').dt.strftime('%Y-%m-%d')
 
             #Insert Data
             df.to_sql('Transactions', conn, if_exists='append', index=False)

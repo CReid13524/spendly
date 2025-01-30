@@ -33,8 +33,7 @@ CREATE TABLE Transactions (
     reference TEXT,
     amount REAL NOT NULL,
     date TEXT NOT NULL,
-    foreignCurrencyAmount REAL,
-    conversionCharge REAL,
+    title TEXT NOT NULL,
     FOREIGN KEY (uploadID) REFERENCES Upload(uploadID) ON DELETE CASCADE,
     FOREIGN KEY (categoryID) REFERENCES Category(categoryID) ON DELETE SET NULL
 );
