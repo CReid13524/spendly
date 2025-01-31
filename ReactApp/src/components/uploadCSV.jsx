@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import Select from 'react-select'
+import { FaExternalLinkAlt } from "react-icons/fa";
 
 function UploadCSV() {
   const [file, setFile] = useState()
@@ -9,9 +10,6 @@ function UploadCSV() {
 
   async function handleUpload(event) {
     event.preventDefault()
-    if (!selectedOption) {
-      console.log(event)
-    }
     setIsLoading(true)
     const formData = new FormData();
     formData.append('file', file);
@@ -40,8 +38,8 @@ function UploadCSV() {
     }
   }
   const options = [
-    {value:'anz', label:'ANZ', color:"#007aff", image:"https://www.anz.co.nz/content/dam/anzconz/media/logo/logo-anz.svg"},
-    {value:'kiwibank', label:'Kiwibank', color:"black", image:"https://www.ib.kiwibank.co.nz/images/logo.png"},
+    {value:'anz', label:'ANZ', color:"#007aff", link:"https://digital.anz.co.nz/preauth/web/service/login", image:"https://www.anz.co.nz/content/dam/anzconz/media/logo/logo-anz.svg"},
+    {value:'kiwibank', label:'Kiwibank', color:"black", link:"https://www.ib.kiwibank.co.nz/login", image:"https://www.ib.kiwibank.co.nz/images/logo.png"},
 
   ]
 
@@ -70,13 +68,14 @@ function UploadCSV() {
     <div id='csv-upload'>
       {error}
       <form onSubmit={handleUpload}>
-      <Select required options={options} closeMenuOnSelect placeholder="Select your bank" value={selectedOption} onChange={setSelectedOption}
+        <Select required options={options} closeMenuOnSelect placeholder="Select your bank" value={selectedOption} onChange={setSelectedOption}
           formatOptionLabel={e => (
             <div className='select-option'>
               <img className='select-image' src={e.image} alt="" />
               <span>{e.label}</span>
             </div>
           )} styles={customStyles} isLoading={isLoading} isDisabled={isLoading}/>
+          {selectedOption ? <a href={selectedOption.link} target="_blank"><FaExternalLinkAlt/></a> : null }
         <input type='file' accept='.csv' onChange={e => setFile(e.target.files[0])} required/>
         <button type='submit'>Upload File</button>
       </form>

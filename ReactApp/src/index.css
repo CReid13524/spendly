@@ -258,14 +258,26 @@ html, body {
             }
 
             #page-section {
-              margin: 15px;
+              margin-top: 15px;
               font-weight: 500;
+            }
+
+            #section-info {
+              margin-top: 15px;
+              margin-bottom: 10px;
+              font-size: 14px;
             }
 
             #csv-upload {
               display: flex;
               flex-direction: column;             
               width: 300px;
+
+              form {
+                display: inline-flex;
+                flex-direction: column;
+                gap: 5px;
+              }
 
               .select-option {
                 display: flex;
@@ -276,6 +288,18 @@ html, body {
                 }
               }
               
+            }
+
+            #csv-delete {
+              display: flex;
+              flex-direction: column;             
+              width: 300px;
+
+              form {
+                display: inline-flex;
+                flex-direction: column;
+                gap: 5px;
+              }
             }
         }
     }
