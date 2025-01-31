@@ -137,7 +137,7 @@ class Secure(Resource):
     def delete(self):
         ...
 
-@api.route('/record_data', '/record_data/<int:count>/<string:categoryID>', '/record_data/<int:count>','/record_data_filter/<int:count>/<string:date>')
+@api.route('/record_data', '/record_data/<int:count>/<string:categoryID>', '/record_data/<int:count>','/record_data_filter/<int:count>/<string:date>','/record_data_mass_delete')
 class RecordData(Resource):
     def get(self, count=0, categoryID=None, date=None):
         try:
@@ -147,6 +147,20 @@ class RecordData(Resource):
             else:
                 userID = auth_data[0]['user']
 
+            curr = get_db()
+            if 'mass_delete' in request.path:
+                curr.execute("""Select Upload.uploadID, Upload.date, count(TransactionID) count FROM Upload
+                                LEFT JOIN TRANSACTIONs on Upload.uploadID = Transactions.uploadID
+                                Where Upload.userID = ?
+                                Group By Upload.uploadID
+                            """, (userID,))
+                data = curr.fetchall()
+
+                columns = [column[0] for column in curr.description]  # Get column names
+                result = [dict(zip(columns, row)) for row in data]
+
+                return {"data":result}, 200
+
             category_filter = ''
             if categoryID:
                 category_filter = f'AND categoryID {'is NULL' if categoryID=='null' else f'= {categoryID}'} '
@@ -154,8 +168,7 @@ class RecordData(Resource):
             date_filter = ''
             if date:
                 date_filter = f"AND strftime('%Y-%m', Transactions.date) = '{date}'"
-
-            curr = get_db()
+            
             curr.execute(f"""select transactionID, title, categoryID, type, details, particulars, code, reference, amount, Transactions.date
                          From Transactions
                          Inner Join Upload on Upload.uploadID = Transactions.uploadID
@@ -290,8 +303,15 @@ class RecordData(Resource):
                 raise auth_data[0]['error']
 
             data = request.get_json()
-
             curr = get_db()
+
+            if 'mass_delete' in request.path:
+                curr.execute("""Delete from Upload
+                                Where uploadID=?
+                            """, (data['uploadID'],))
+                curr.connection.commit()
+                return {}, 200
+
             curr.execute("""Delete from Transactions
                             Where transactionID = ?""",(data['transactionID'],))
 
