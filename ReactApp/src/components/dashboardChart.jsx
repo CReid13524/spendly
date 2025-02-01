@@ -190,8 +190,10 @@ const toggleLabelVisibility = (chart, labelIndex, forceOff=null) => {
 
   // Update the chart to reflect hidden labels
   chart.data.labels.forEach((label, i) => {
-    const meta = chart.getDatasetMeta(0); // Assuming you're using dataset 0 for this
+    const meta = chart.getDatasetMeta(0);
+    const meta1 = chart.getDatasetMeta(1);
     meta.data[i].hidden = hiddenLabels.current.includes(i);
+    meta1.data[i].hidden = hiddenLabels.current.includes(i);
   });
 
   // Update the chart to reflect the changes
