@@ -33,7 +33,6 @@ function DeleteCSV() {
         throw data.error
       } else {
         setUserData(data.data)
-        console.log(data.data)
       }
     } catch (error) {
       handleError(error)
@@ -133,9 +132,6 @@ function DeleteCSV() {
       </div>
       : <GoogleLogin
       onSuccess={connectGoogle}
-      onError={() => {
-        console.log('Login Failed');
-      }}
       theme="filled_black"
       width={300}
       logo_alignment="left"

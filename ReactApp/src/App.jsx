@@ -36,7 +36,7 @@ function App() {
             throw response.statusText
           }
           const data = await response.json();
-          console.log('Auth Data Received')
+          console.log('Auth verified')
           if (!data.valid) {
             alert(`Session expired. Please log in again.\n(${data.error})`);
             navigate('/login');

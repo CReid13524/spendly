@@ -38,7 +38,6 @@ const CategoryCarousel = ({headerToggle}) => {
   }
 
   async function createCategory(name,color,icon) {
-    console.log(name,color,icon)
 
     try {
       const response = await fetch('/api/categories', {

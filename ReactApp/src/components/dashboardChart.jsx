@@ -25,7 +25,6 @@ const DashboardChart = ({refreshOnState, dateSpecify}) => {
       if (!response.ok) {
           throw data.error
       } else {
-        console.log()
         setCategoryData(data.data.filter((e) => Number(e.amount.replace('$',''))))
       
       }
