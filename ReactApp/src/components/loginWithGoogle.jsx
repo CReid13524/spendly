@@ -34,9 +34,6 @@ function LoginWithGoogle() {
     {error}
     <GoogleLogin
       onSuccess={(credentialResponse) => handleLogin(credentialResponse)}
-      onError={() => {
-        console.log('Login Failed');
-      }}
       useOneTap
       theme="filled_blue"
       width={300}
