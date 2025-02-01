@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import PageHeader from '../components/pageHeader'
 import UploadCSV from '../components/uploadCSV'
 import DeleteCSV from '../components/deleteCSV'
+import EditSettings from '../components/editSettings'
 
 function settings() {
   
@@ -16,7 +17,8 @@ function settings() {
         <div id="section-info">Delete CSV Data</div>
         <DeleteCSV/>
         <div id="page-section">User Data</div>
-        <div id="section-info">Upload CSV</div>
+        <div id="section-info">Login</div>
+        <EditSettings/>
       </div>
     </div>
 
