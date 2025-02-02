@@ -64,7 +64,7 @@
       background-color: inherit;
       font-family: inherit;
       max-width: 160px;
-      overflow-x: scroll;
+      overflow-x: auto;
     }
     .card-name::placeholder {color: black;}
   }

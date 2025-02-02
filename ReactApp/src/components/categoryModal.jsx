@@ -14,6 +14,8 @@ function CategoryModal({open, categoryData, onClose, handleError, onUpdate}) {
     const [editActive, setEditActive] = useState(false)
     const [selectColor, setSelectColor] = useState(categoryData.colour)
     const [selectIncome, setSelectIncome] = useState(categoryData.isIncome)
+    const [isHidden, setIsHidden] = useState(categoryData.isHidden)
+    const [isDefault, setIsDefault] = useState(categoryData.isDefault)
     const [selectName, setSelectName] = useState(categoryData.name)
     const [selectIcon, setSelectIcon] = useState(categoryData.icon)
     const [emojiModalOpen, setEmojiModalOpen] = useState(false)
@@ -73,12 +75,14 @@ function CategoryModal({open, categoryData, onClose, handleError, onUpdate}) {
       }, [editActive]);
 
 
-      async function handleUpdate(isIncome=selectIncome) {
+      async function handleUpdate({reqIsIncome=selectIncome,reqIsDefault=isDefault,reqIsHidden=isHidden}) {
         try {
           const response = await fetch('/api/categories', {
             method: 'PUT',
             headers:  {'Content-Type' : 'application/json'},
-            body: JSON.stringify({"categoryID":categoryData.categoryID, 'color':selectColor, 'name':selectName, 'icon':selectIcon, 'isIncome': isIncome ? 1 : 0})
+            body: JSON.stringify({"categoryID":categoryData.categoryID, 'color':selectColor, 'name':selectName, 'icon':selectIcon, 'isIncome': reqIsIncome ? 1 : 0,
+              'isDefault': reqIsDefault ? 1 : 0, 'isHidden': reqIsHidden ? 1 : 0
+            })
           });
           const data = await response.json();
           if (!response.ok) {
@@ -97,7 +101,7 @@ function CategoryModal({open, categoryData, onClose, handleError, onUpdate}) {
       };
       const handleEmojiPickerClose = (e) => {
         handleToggleEmojiPicker(e)
-        handleUpdate()
+        handleUpdate({})
       };
 
     function handleTransactionModalClose() {
@@ -137,9 +141,18 @@ All existing transaction will be unset.`))
 
   function handleIsIncome(e) {
     e.stopPropagation()
-    handleUpdate(!selectIncome)
+    handleUpdate({isIncome:!selectIncome})
     setSelectIncome((e) => !e)
-    
+  }
+  function handleIsDefault(e) {
+    e.stopPropagation()
+    handleUpdate({reqIsDefault:!isDefault})
+    setIsDefault((e) => !e)
+  }
+  function handleIsHidden(e) {
+    e.stopPropagation()
+    handleUpdate({reqIsHidden:!isHidden})
+    setIsHidden((e) => !e)
   }
 
     if (!open) return null
@@ -165,9 +178,18 @@ All existing transaction will be unset.`))
                         </div>
                         
                     </div>
-                    {editActive ? <div className='income-check'>Income
+                    {editActive ?
+                    <div className="chart-options">
+                      <div className='income-check'>Hidden
+                    <input type='checkbox' checked={isHidden} onChange={handleIsHidden}/>
+                  </div> 
+                    <div className='income-check'>Show by default
+                    <input type='checkbox' checked={isDefault} onChange={handleIsDefault}/>
+                  </div> 
+                    <div className='income-check'>Income
                       <input type='checkbox' checked={selectIncome} onChange={handleIsIncome}/>
-                    </div> : null }
+                    </div>
+                    </div>: null }
                     <div className='title-amount'>
                     {categoryData.amount}
                     </div>

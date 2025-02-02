@@ -775,6 +775,12 @@ html, body {
         align-items: center;
         padding-bottom: 15px;
 
+        .chart-options {
+          display: flex;
+          justify-content: flex-end;
+          gap: 5px;
+        }
+
         .income-check {
           display: flex;
           font-size: 12px;

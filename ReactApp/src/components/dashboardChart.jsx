@@ -11,12 +11,16 @@ const DashboardChart = ({refreshOnState, dateSpecify}) => {
   const incomeButtonRef = useRef(null);
   const categoriesButtonRef = useRef(null);
   const categoryDataRef = useRef([])
+  const defaultInitialised = useRef(false)
+
+  defaultInitialised
 
   useEffect(() => {
     categoryDataRef.current = categoryData
   },[categoryData])
 
   useEffect(() => {
+    defaultInitialised.current = false
   async function getCategoryData() {
     
     try {
@@ -25,7 +29,7 @@ const DashboardChart = ({refreshOnState, dateSpecify}) => {
       if (!response.ok) {
           throw data.error
       } else {
-        setCategoryData(data.data.filter((e) => Number(e.amount.replace('$',''))))
+        setCategoryData(data.data.filter((e) => Number(e.amount.replace('$','')) && e.isHidden===0))
       
       }
     } catch (error) {
@@ -113,6 +117,7 @@ const DashboardChart = ({refreshOnState, dateSpecify}) => {
       });
       
       toggleDatasetVisibility(chartInstance.current,1)
+      
     } else {
       // Update the chart data
       chartInstance.current.data.labels = labels;
@@ -135,12 +140,12 @@ const DashboardChart = ({refreshOnState, dateSpecify}) => {
   }, [categoryData]);
 
   function strikethroughLegend(labelIndex, addStrike) {
+    
     const legendElements = document.querySelectorAll('.legend-item');
-    if (addStrike) {
-      legendElements[labelIndex].style.textDecoration = 'line-through'
-    } else {
-      legendElements[labelIndex].style.textDecoration = 'none'
-    }
+    const element = legendElements[labelIndex]
+    element.children[0].style.textDecoration = ''
+
+    element.style.textDecoration = addStrike ? 'line-through' : ''
   }
 
 
@@ -151,7 +156,7 @@ const DashboardChart = ({refreshOnState, dateSpecify}) => {
       const isHidden = hiddenLabels.current.includes(index);
       return `
         <div class="legend-item" key=${index}>
-          <span class="legend-label" style="text-decoration:${isHidden ?  'line-through' : ''};">${label[1]}${label[0]}</span>
+          <span class="legend-label" style="text-decoration:${isHidden ?  'line-through' : '' /*Inital load*/ };">${label[1]}${label[0]}</span>
           <span class="legend-icon" style="background-color: ${color};"></span>
         </div>`;
     });
@@ -175,17 +180,20 @@ const DashboardChart = ({refreshOnState, dateSpecify}) => {
     chart.update();
   };
 
+
 const toggleLabelVisibility = (chart, labelIndex, forceOff=null) => {
   if (!chart) return;
-
   // Toggle the visibility of the label
   if (hiddenLabels.current.includes(labelIndex) && !forceOff) {
-    hiddenLabels.current = hiddenLabels.current.filter((i) => i !== labelIndex)
-    strikethroughLegend(labelIndex, false)
-  } else if (forceOff===null || forceOff) {
-    strikethroughLegend(labelIndex, true)
-    hiddenLabels.current.push(labelIndex, true);
+    hiddenLabels.current = hiddenLabels.current.filter((i) => i !== labelIndex);
+    strikethroughLegend(labelIndex, false);
+  } else if (forceOff === null || forceOff) {
+    if (!hiddenLabels.current.includes(labelIndex)) {
+      hiddenLabels.current.push(labelIndex);
+      strikethroughLegend(labelIndex, true);
+    }
   }
+  
 
   // Update the chart to reflect hidden labels
   chart.data.labels.forEach((label, i) => {
@@ -248,7 +256,17 @@ const toggleLabelVisibility = (chart, labelIndex, forceOff=null) => {
   }
   }
 
- 
+  useEffect(() => {
+    if (categoryData.length && !defaultInitialised.current) {
+      categoryData.forEach((e, index) => {
+        if (e.isDefault === 0) {
+          toggleLabelVisibility(chartInstance.current, index, true);
+        }
+      });
+      defaultInitialised.current = true;
+    }
+    
+  }, [categoryData, dateSpecify]);
 
   return (
     <>
