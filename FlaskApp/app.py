@@ -35,8 +35,27 @@ def get_auth_data():
 @api.route('/user')
 class User(Resource):
 
-    def get(self, email):
-        ...
+    def get(self):
+        try:
+            auth_data = get_auth_data()
+            if not auth_data[0]['valid']:
+                raise auth_data[0]['error']
+            else:
+                userID = auth_data[0]['user']
+            
+            curr = get_db()
+
+            curr.execute("""Select email, googleEmail, googleImage, name, dateCreated, googleID
+                        From User
+                        Where userID=?""",(userID,))
+            data = curr.fetchone()
+
+            columns = [column[0] for column in curr.description]  # Get column names
+            result = dict(zip(columns, data))
+            return {'data':result}, 200
+        except Exception as e:
+            return  {'error': str(e)}, 500
+       
     
     def post(self):
         try:
@@ -51,9 +70,78 @@ class User(Resource):
         except Exception as e:
             return  {'error': str(e)}, 500
     def put(self):
+        try:
+            auth_data = get_auth_data()
+            if not auth_data[0]['valid']:
+                raise auth_data[0]['error']
+            else:
+                userID = auth_data[0]['user']
+
+            curr = get_db()
+            data = request.get_json()
+
+            if data['type'] == 'user':
+                curr.execute("select password from User where userID=?", (userID,))
+                db_data = curr.fetchone()
+                hashed_password = db_data[0]
+                verified = bcrypt.checkpw(data['password'].encode('utf-8'), hashed_password.encode('utf-8'))
+                
+                if not verified:
+                    raise Exception("Invalid Password")
+                
+                curr.execute("""Update User set password=?
+                            Where userID=?""",(data['passwordNew'], userID))
+                curr.connection.commit()
+
+            else:
+                cred = data['credential']['credential']
+                
+                id_info = id_token.verify_oauth2_token(cred, requests.Request(), app.config['GOOGLE_CLIENT_ID'])
+                if id_info['aud'] != app.config['GOOGLE_CLIENT_ID']:
+                    raise ValueError('Could not verify audience.')
+
+                curr.execute("select userID,email from User where googleID=?", (id_info['sub'],))
+                data = curr.fetchone()
+
+                #Update Existing
+                if not data:
+                    curr.execute("""Update User set googleEmail=?, name=?, googleID=?, googleImage=?
+                                Where userID = ? 
+                                """, (userID,id_info['email'], id_info['name'], id_info['sub'], id_info['picture']))
+                    curr.connection.commit()
+                elif (data[0] and not data[1]) and (data[0] != userID):
+                    #Logged into a user and has signed up seperatley with google account
+                    raise Exception("Account already exists under Google ID. Please remove this account if you wish to connect with Google.")
+                    ...
+            
+            return {},200
+            
+        except Exception as e:
+            return  {'error': str(e)}, 500
         ...
     def delete(self):
-        ...
+        try:
+            auth_data = get_auth_data()
+            if not auth_data[0]['valid']:
+                raise auth_data[0]['error']
+            else:
+                userID = auth_data[0]['user']
+
+            curr = get_db()
+            data = request.get_json()
+
+            if data['type'] == 'reset':
+                curr.execute("""PRAGMA foreign_keys = ON;
+                             Delete from Upload where userID = ?;
+                             Delete from Category where userID=?;""", (userID,userID))
+                curr.connection.commit()
+            elif data['type'] == 'delete':
+                curr.execute("""PRAGMA foreign_keys = ON;
+                             Delete from User where userID=?""", (userID,))
+            return {}, 200
+
+        except Exception as e:
+            return  {'error': str(e)}, 500
 
 @api.route('/secure', '/secure/<string:email>')
 class Secure(Resource):
@@ -83,6 +171,7 @@ class Secure(Resource):
     def get(self, email):
         try:
             curr = get_db()
+        
             curr.execute("select userID from User where email=?", (email,))
             return {'isStored':bool(curr.fetchone())}, 200
         
@@ -306,8 +395,9 @@ class RecordData(Resource):
             curr = get_db()
 
             if 'mass_delete' in request.path:
-                curr.execute("""Delete from Upload
-                                Where uploadID=?
+                curr.execute("""PRAGMA foreign_keys = ON;
+                            Delete from Upload
+                            Where uploadID=?;
                             """, (data['uploadID'],))
                 curr.connection.commit()
                 return {}, 200
@@ -342,7 +432,7 @@ class Categories(Resource):
                 curr.execute(f"""with transData as (
                                     Select Category.categoryID, IFNULL(SUM(amount),0.0) amount
                                     from Category
-                                    JOIN Transactions on Transactions.categoryID = Category.categoryID
+                                    LEFT JOIN Transactions on Transactions.categoryID = Category.categoryID
                                     {date_filter}
                                     Group by Category.categoryID
                                 )
@@ -408,8 +498,9 @@ class Categories(Resource):
             data = request.get_json()
 
             curr = get_db()
-            curr.execute("""Delete from Category 
-                            Where categoryID=?""", (data['categoryID'],))
+            curr.execute("""PRAGMA foreign_keys = ON;
+                        Delete from Category 
+                        Where categoryID=?;""", (data['categoryID'],))
             curr.connection.commit()
 
             return {}, 200
