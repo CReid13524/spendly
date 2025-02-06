@@ -75,7 +75,7 @@ function UploadCSV() {
               <span>{e.label}</span>
             </div>
           )} styles={customStyles} isLoading={isLoading} isDisabled={isLoading}/>
-          {selectedOption ? <a href={selectedOption.link} target="_blank"><FaExternalLinkAlt/></a> : null }
+          {selectedOption ? <a href={selectedOption.link} target="_blank" rel="noopener noreferrer"><FaExternalLinkAlt/></a> : null }
         <input type='file' accept='.csv' onChange={e => setFile(e.target.files[0])} required/>
         <button type='submit'>Upload File</button>
       </form>

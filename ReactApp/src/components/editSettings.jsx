@@ -101,10 +101,6 @@ function DeleteCSV() {
       if (!response.ok) {
         throw data.error
       } else {
-        if (type==='delete'){
-          document.cookie = "auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-
-        }
         window.location.reload()
       }
     } catch (error) {
