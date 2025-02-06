@@ -17,68 +17,29 @@ function App() {
   const location = useLocation();
   const hideNav = location.pathname === '/login';
   const navigate = useNavigate();
-  const hasCheckedAuth = useRef(false);
-  const [isAuthVerified, setIsAuthVerified] = useState(false);
-  const [isAuthLoading, setIsAuthLoading] = useState(true);
+  const [appData, setAppData] = useState(null);
 
 
   useEffect(() => {
     // Run auth verification only if not on the login page
-    if (location.pathname !== '/login') {
-      const verifyAuth = async () => {
+      const verifyAuth = async (quick=false) => {
         try {
           const response = await fetch('/api/secure', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
           });
+          const data = await response.json();
           if (response.status == 500) {
             throw response.statusText
           }
-          const data = await response.json();
           console.log('Auth verified')
-          if (!data.valid) {
+          if (!data.valid && !quick) {
             alert(`Session expired. Please log in again.\n(${data.error})`);
             navigate('/login');
-            setIsAuthVerified(false);
           } else {
-            setIsAuthVerified(true);
-          }
-        } catch (error) {
-          alert(`Failed to verify authentication: ${error}`);
-          navigate('/login');
-          setIsAuthVerified(false);
-        } finally {
-          setIsAuthLoading(false);
-        }
-      };
-
-      if (hasCheckedAuth.current) {
-      verifyAuth();
-      } else {
-        setIsAuthVerified(false)
-      }
-      hasCheckedAuth.current = true
-
-      const intervalId = setInterval(verifyAuth, 300000) // Check every 5 minutes
-      return () => clearInterval(intervalId);
-      
-
-    } else {setIsAuthLoading(false)}
-    
-  }, [location.pathname, navigate]);
-
-  if (isAuthLoading && hideNav) {
-    return <LoadingAnimated />;
-  }
-
-  return (
-    <>
-      {!hideNav && isAuthVerified && <NavigationBar/>}
-      <Routes>
-          <Route path="/login" element={<Login />} />
-          {isAuthVerified ? 
-            <>
+            setAppData(
+              <>
               <Route path="/" element={<Dashboard />} />
               <Route path="/categories" element={<Categories />} />
               <Route path="/reconcile" element={<Reconcile />} />
@@ -86,7 +47,32 @@ function App() {
               <Route path="/settings" element={<Settings />} />
               <Route path="*" element={<NotFound />} />
             </> 
-            :<></> }
+            )
+            if (quick) navigate('/')
+          }
+        } catch (error) {
+          if (!quick) {
+            alert(`Failed to verify authentication: ${error}`);
+            navigate('/login');
+          }
+        }
+      };
+      if (location.pathname !== '/login') verifyAuth();
+      else {
+        verifyAuth(true)
+      }
+
+      const intervalId = setInterval(verifyAuth, 300000) // Check every 5 minutes
+      return () => clearInterval(intervalId);
+    
+    }, [location.pathname, navigate]);
+
+  return (
+    <>
+      {!hideNav && appData && <NavigationBar/>}
+      <Routes>
+          <Route path="/login" element={<Login />} />
+          {appData}
       </Routes>
     </>
   )
