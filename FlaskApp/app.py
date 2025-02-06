@@ -250,18 +250,20 @@ class RecordData(Resource):
 
                 return {"data":result}, 200
 
+            hidden_filter = ["Inner Join Category on Transactions.categoryID = Category.categoryID", "AND isHidden=0"]
             category_filter = ''
             if categoryID:
-                category_filter = f'AND categoryID {'is NULL' if categoryID=='null' else f'= {categoryID}'} '
+                category_filter = f'AND Transactions.categoryID {'is NULL' if categoryID=='null' else f'= {categoryID}'}'
 
             date_filter = ''
             if date:
                 date_filter = f"AND strftime('%Y-%m', Transactions.date) = '{date}'"
             
-            curr.execute(f"""select transactionID, title, categoryID, type, details, particulars, code, reference, amount, Transactions.date
+            curr.execute(f"""select transactionID, title, Transactions.categoryID, type, details, particulars, code, reference, amount, Transactions.date
                          From Transactions
                          Inner Join Upload on Upload.uploadID = Transactions.uploadID
-                         Where userID = ? {category_filter} {date_filter}
+                         {hidden_filter[0] if not category_filter else ''}
+                         Where Upload.userID = ? {category_filter if category_filter else hidden_filter[1]} {date_filter}
                          Order By JULIANDAY(Transactions.date) DESC
                          Limit 50 OFFSET ?""", (userID,count))
             data = curr.fetchall()
@@ -437,7 +439,7 @@ class Categories(Resource):
                                     Group by Category.categoryID
                                 )
 
-                                Select  Category.categoryID, name, colour, icon, transData.amount, isIncome from Category
+                                Select  Category.categoryID, name, colour, icon, transData.amount, isIncome, isHidden, isDefault from Category
                                 JOIN transData on transData.categoryID = Category.categoryID
                                 Where userID=?""",(userID,))
             else:
@@ -482,9 +484,9 @@ class Categories(Resource):
             data = request.get_json()
 
             curr = get_db()
-            curr.execute("""Update Category set name=?, colour=?, icon=?, isIncome=?
+            curr.execute("""Update Category set name=?, colour=?, icon=?, isIncome=?, isHidden=?, isDefault=?
                             Where categoryID = ?""",
-                         (data['name'],data['color'],data['icon'],data['isIncome'], data['categoryID']))
+                         (data['name'],data['color'],data['icon'],data['isIncome'],data['isHidden'],data['isDefault'], data['categoryID']))
             curr.connection.commit()
 
             return {}, 200
