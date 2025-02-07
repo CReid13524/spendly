@@ -37,7 +37,7 @@ function App() {
           if (!data.valid && !quick) {
             alert(`Session expired. Please log in again.\n(${data.error})`);
             navigate('/login');
-          } else {
+          } else if (data.valid) {
             setAppData(
               <>
               <Route path="/" element={<Dashboard />} />
