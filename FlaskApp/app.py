@@ -250,7 +250,7 @@ class RecordData(Resource):
 
                 return {"data":result}, 200
 
-            hidden_filter = ["Inner Join Category on Transactions.categoryID = Category.categoryID", "AND isHidden=0"]
+            hidden_filter = ["LEFT Join Category on Transactions.categoryID = Category.categoryID", "AND (isHidden=0 OR isHidden IS NULL)"]
             category_filter = ''
             if categoryID:
                 category_filter = f'AND Transactions.categoryID {'is NULL' if categoryID=='null' else f'= {categoryID}'}'
@@ -294,7 +294,7 @@ class RecordData(Resource):
             
             data = json.loads(request.form['data'])
        
-            if file.filename.endswith('.csv'):
+            if file.filename.lower().endswith('.csv'):
                 df = pd.read_csv(file)
             elif file.filename.endswith('.xlsx'):
                 df = pd.read_excel(file)
