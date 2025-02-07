@@ -10,6 +10,7 @@ import Settings from './pages/settings'
 import NotFound from './pages/notFound'
 import LoadingAnimated from './components/loadingAnimated'
 import NavigationBar from './components/navigationBar'
+import Help from './pages/help'
 
 
 
@@ -46,6 +47,7 @@ function App() {
               <Route path="/statistics" element={<Statistics />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="*" element={<NotFound />} />
+              <Route path="/help" element={<Help />} />
             </> 
             )
             if (quick) navigate('/')

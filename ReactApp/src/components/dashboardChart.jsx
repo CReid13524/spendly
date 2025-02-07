@@ -3,6 +3,7 @@ import Chart from 'chart.js/auto';
 import { AiOutlinePlus } from "react-icons/ai";
 
 const DashboardChart = ({refreshOnState, dateSpecify}) => {
+  const defaultCategory = {categoryID:0,name:'No Categories',icon:' ',amount:'-$0.01', colour:'#6062647a', isDefault:1, isHidden:0, isIncome:false}
   const chartRef = useRef(null);
   const [categoryData, setCategoryData] = useState([])
   const hiddenLabels = useRef([])
@@ -12,8 +13,6 @@ const DashboardChart = ({refreshOnState, dateSpecify}) => {
   const categoriesButtonRef = useRef(null);
   const categoryDataRef = useRef([])
   const defaultInitialised = useRef(false)
-
-  defaultInitialised
 
   useEffect(() => {
     categoryDataRef.current = categoryData
@@ -29,8 +28,10 @@ const DashboardChart = ({refreshOnState, dateSpecify}) => {
       if (!response.ok) {
           throw data.error
       } else {
-        setCategoryData(data.data.filter((e) => Number(e.amount.replace('$','')) && e.isHidden===0))
-      
+        
+        if (!data.data.length) {
+          setCategoryData([defaultCategory])
+        } else setCategoryData(data.data.filter((e) => Number(e.amount.replace('$','')) && e.isHidden===0))
       }
     } catch (error) {
       setError(
@@ -258,6 +259,7 @@ const toggleLabelVisibility = (chart, labelIndex, forceOff=null) => {
 
   useEffect(() => {
     if (categoryData.length && !defaultInitialised.current) {
+      if (!categoryData[0].categoryID) return
       categoryData.forEach((e, index) => {
         if (e.isDefault === 0) {
           toggleLabelVisibility(chartInstance.current, index, true);
@@ -265,8 +267,7 @@ const toggleLabelVisibility = (chart, labelIndex, forceOff=null) => {
       });
       defaultInitialised.current = true;
     }
-    
-  }, [categoryData, dateSpecify]);
+  }, [categoryData]);
 
   return (
     <>

@@ -30,7 +30,7 @@ function DashboardCarousel({headerToggle, onChange, dateSpecify}) {
       } else {
         setCardData(data.data)
         if (data.data.length === 0) {
-          setLimitText('No more records to display')
+          setLimitText(dateSpecify ? 'No more records to display' : <div>Get started by adding transactions in <a href="/settings">settings</a>!</div>)
         }
       }
     } catch (error) {

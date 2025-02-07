@@ -6,7 +6,7 @@ function PageHeader() {
   return (
     <div id="page-header">
         <h1>Spendly</h1>
-        <div id='header-help-button'><Link to=""><AiFillQuestionCircle /></Link></div>
+        <div id='header-help-button'><Link to="/help"><AiFillQuestionCircle /></Link></div>
     </div>
   )
 }
