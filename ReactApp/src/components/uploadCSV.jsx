@@ -24,7 +24,9 @@ function UploadCSV() {
       const data = await response.json();
       if (!response.ok) {
         throw data.error
-      } 
+      } else (
+        alert("CSV upload was successful")
+      )
     } catch (error) {
       setError(
         <div className='error-message'>
