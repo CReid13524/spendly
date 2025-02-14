@@ -131,13 +131,13 @@ class User(Resource):
             data = request.get_json()
 
             if data['type'] == 'reset':
-                curr.execute("""PRAGMA foreign_keys = ON;
-                             Delete from Upload where userID = ?;
+                curr.execute("PRAGMA foreign_keys = ON")
+                curr.execute("""Delete from Upload where userID = ?;
                              Delete from Category where userID=?;""", (userID,userID))
                 curr.connection.commit()
             elif data['type'] == 'delete':
-                curr.execute("""PRAGMA foreign_keys = ON;
-                             Delete from User where userID=?""", (userID,))
+                curr.execute("PRAGMA foreign_keys = ON")
+                curr.execute("""Delete from User where userID=?""", (userID,))
             return {}, 200
 
         except Exception as e:
@@ -250,7 +250,7 @@ class RecordData(Resource):
 
                 return {"data":result}, 200
 
-            hidden_filter = ["Inner Join Category on Transactions.categoryID = Category.categoryID", "AND isHidden=0"]
+            hidden_filter = ["LEFT Join Category on Transactions.categoryID = Category.categoryID", "AND (isHidden=0 OR isHidden IS NULL)"]
             category_filter = ''
             if categoryID:
                 category_filter = f'AND Transactions.categoryID {'is NULL' if categoryID=='null' else f'= {categoryID}'}'
@@ -294,7 +294,7 @@ class RecordData(Resource):
             
             data = json.loads(request.form['data'])
        
-            if file.filename.endswith('.csv'):
+            if file.filename.lower().endswith('.csv'):
                 df = pd.read_csv(file)
             elif file.filename.endswith('.xlsx'):
                 df = pd.read_excel(file)
@@ -397,8 +397,8 @@ class RecordData(Resource):
             curr = get_db()
 
             if 'mass_delete' in request.path:
-                curr.execute("""PRAGMA foreign_keys = ON;
-                            Delete from Upload
+                curr.execute("PRAGMA foreign_keys = ON")
+                curr.execute("""Delete from Upload
                             Where uploadID=?;
                             """, (data['uploadID'],))
                 curr.connection.commit()
@@ -500,8 +500,8 @@ class Categories(Resource):
             data = request.get_json()
 
             curr = get_db()
-            curr.execute("""PRAGMA foreign_keys = ON;
-                        Delete from Category 
+            curr.execute("PRAGMA foreign_keys = ON")
+            curr.execute("""Delete from Category 
                         Where categoryID=?;""", (data['categoryID'],))
             curr.connection.commit()
 
