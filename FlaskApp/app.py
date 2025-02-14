@@ -131,13 +131,13 @@ class User(Resource):
             data = request.get_json()
 
             if data['type'] == 'reset':
-                curr.execute("""PRAGMA foreign_keys = ON;
-                             Delete from Upload where userID = ?;
+                curr.execute("PRAGMA foreign_keys = ON")
+                curr.execute("""Delete from Upload where userID = ?;
                              Delete from Category where userID=?;""", (userID,userID))
                 curr.connection.commit()
             elif data['type'] == 'delete':
-                curr.execute("""PRAGMA foreign_keys = ON;
-                             Delete from User where userID=?""", (userID,))
+                curr.execute("PRAGMA foreign_keys = ON")
+                curr.execute("""Delete from User where userID=?""", (userID,))
             return {}, 200
 
         except Exception as e:
@@ -397,8 +397,8 @@ class RecordData(Resource):
             curr = get_db()
 
             if 'mass_delete' in request.path:
-                curr.execute("""PRAGMA foreign_keys = ON;
-                            Delete from Upload
+                curr.execute("PRAGMA foreign_keys = ON")
+                curr.execute("""Delete from Upload
                             Where uploadID=?;
                             """, (data['uploadID'],))
                 curr.connection.commit()
@@ -500,8 +500,8 @@ class Categories(Resource):
             data = request.get_json()
 
             curr = get_db()
-            curr.execute("""PRAGMA foreign_keys = ON;
-                        Delete from Category 
+            curr.execute("PRAGMA foreign_keys = ON")
+            curr.execute("""Delete from Category 
                         Where categoryID=?;""", (data['categoryID'],))
             curr.connection.commit()
 
