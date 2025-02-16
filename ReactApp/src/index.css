@@ -287,6 +287,11 @@ html, body {
                 height: 20px;
                 }
               }
+
+              #csv-external {
+                display: flex;
+                justify-content: space-between;
+              }
               
             }
 
