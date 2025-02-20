@@ -1,0 +1,88 @@
+#category-vertical-scroll-carousel {
+  position: relative;
+  width: 300px; /* Fixed width for the carousel */
+  max-height: 85vh; /* Adjust height to control how many cards are visible */
+  overflow-y: scroll; /* Enable vertical scrolling */
+  scroll-snap-type: y mandatory; /* Snap cards into position when scrolling */
+  background-color: #f0f0f0;
+  border-radius: 10px;
+  margin-top: 20px;
+  margin-bottom: 70px;
+  align-self: center;
+  
+  .limit-reached-text {
+    text-align: center;
+  }
+}
+
+.category-carousel-card {
+  scroll-snap-align: start; /* Snap each card to the top of the container */
+  width: 100%;
+  height: 50px; 
+  min-height: fit-content;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  overflow-x: hidden;
+  justify-content: space-between;
+  cursor: pointer;
+
+  .new-category-done-text {
+    all: unset;
+    font-size: 10px;
+    color: #3080d0
+  }
+  .new-category-done-text:hover {
+    color: #3080d0af
+  }
+
+  .card-icon {
+    font-size: 25px;
+    line-height: 1;
+    width: 25px;
+    height: 25px;
+    
+
+    svg {
+      height: 25px;
+      width: 25px;
+      padding-left: 3px;
+    }
+  }
+
+  .carousel-card-algin-left {
+    display: flex;
+    flex-direction: row;
+    margin-left: 10px;
+    align-items: center;
+
+    .card-name {
+      margin-left: 15px;
+      border: none;
+      background-color: inherit;
+      font-family: inherit;
+      max-width: 160px;
+      overflow-x: auto;
+    }
+    .card-name::placeholder {color: black;}
+  }
+  .carousel-card-algin-right {
+    margin-right: 10px;
+    display: inline-block;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    border: 1px solid black;
+
+    input {
+      border-radius: 50%;
+      width: 25px;
+      height: 25px;
+      cursor: pointer;
+      opacity: 0;
+    }
+  }
+}
+

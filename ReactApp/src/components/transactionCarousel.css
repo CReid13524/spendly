@@ -1,0 +1,52 @@
+#transaction-carousel {
+  position: relative;
+  width: 300px; /* Fixed width for the carousel */
+  max-height: 85vh; /* Adjust height to control how many cards are visible */
+  overflow-y: scroll; /* Enable vertical scrolling */
+  scroll-snap-type: y mandatory; /* Snap cards into position when scrolling */
+  background-color: #f0f0f0;
+  border-radius: 10px;
+  margin-top: 20px;
+  margin-bottom: 70px;
+  
+  .limit-reached-text {
+    text-align: center;
+  }
+}
+
+.carousel-card {
+  scroll-snap-align: start; /* Snap each card to the top of the container */
+  width: 100%;
+  height: 50px; 
+  min-height: fit-content;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  overflow-x: hidden;
+  justify-content: space-between;
+  cursor: pointer;
+
+  
+
+  .carousel-card-algin-left {
+    display: flex;
+    flex-direction: column;
+    margin: 5px;
+
+    .date {
+      font-size: 12px;
+    }
+  }
+  .carousel-card-algin-right {
+    margin: 5px;
+    text-align: right;
+
+    .transaction-card-icon {
+      font-size: 10px;
+    }
+  }
+
+}
+
