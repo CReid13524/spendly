@@ -130,15 +130,25 @@ class User(Resource):
             curr = get_db()
             data = request.get_json()
 
+            response = make_response({}, 200)
             if data['type'] == 'reset':
                 curr.execute("PRAGMA foreign_keys = ON")
-                curr.execute("""Delete from Upload where userID = ?;
-                             Delete from Category where userID=?;""", (userID,userID))
-                curr.connection.commit()
+                curr.execute("Delete from Upload where userID = ?", (userID,))
+                curr.execute("Delete from Category where userID=?", (userID,))
             elif data['type'] == 'delete':
                 curr.execute("PRAGMA foreign_keys = ON")
                 curr.execute("""Delete from User where userID=?""", (userID,))
-            return {}, 200
+                
+                response.set_cookie(
+                    'auth_token',
+                    "",
+                    max_age=0,
+                    httponly=True,
+                    secure=False,
+                    samesite='Strict'
+                )
+            curr.connection.commit()
+            return response
 
         except Exception as e:
             return  {'error': str(e)}, 500
@@ -346,9 +356,9 @@ class RecordData(Resource):
                 df['title'] = None
                 
                 # Combine TP and OP references into a single 'reference' column
-                df['reference'] = df.apply(lambda row: f"(TP) {row['tp_ref']} (OP) {row['op_ref']}" if not pd.isna(row['tp_ref']) else '', axis=1)
-                df['code'] = df.apply(lambda row: f"(TP) {row['tp_code']} (OP) {row['op_code']}" if not pd.isna(row['tp_code']) else '', axis=1)
-                df['particulars'] = df.apply(lambda row: f"(TP) {row['tp_part']} (OP) {row['op_part']}" if not pd.isna(row['tp_part']) else '', axis=1)
+                df['reference'] = df.apply(lambda row: f"(TP) {row['tp_ref']} " if not pd.isna(row['tp_ref']) else '' + f"(OP) {row['op_ref']}" if not pd.isna(row['op_ref']) else '', axis=1)
+                df['code'] = df.apply(lambda row: f"(TP) {row['tp_code']} " if not pd.isna(row['tp_code']) else '' + f"(OP) {row['op_code']}" if not pd.isna(row['op_code']) else '', axis=1)
+                df['particulars'] = df.apply(lambda row: f"(TP) {row['tp_part']} " if not pd.isna(row['tp_part']) else '' + f"(OP) {row['op_part']}" if not pd.isna(row['op_part']) else '', axis=1)
                 
                 # Split 'Memo/Description' column on semicolon into 'details' and 'code'
                 df[['title', 'details']] = df['details'].str.split(';', n=1, expand=True)
