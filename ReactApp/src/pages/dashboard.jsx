@@ -8,7 +8,10 @@ import { IoChevronBackCircle } from "react-icons/io5";
 function dashboard() {
   const [headerEnabled, setHeaderEnabled] = useState(true)
   const [refreshOnState, setRefreshOnState] = useState(false)
-  const [dateSpecify, setDateSpecify] = useState('')
+  const now = new Date();
+  const year_now = now.getFullYear();
+  const month_now = now.getMonth() + 1;
+  const [dateSpecify, setDateSpecify] = useState(`${year_now}-${String(month_now).padStart(2, '0')}`)
 
   function test() {
     setHeaderEnabled(!headerEnabled)
@@ -21,9 +24,7 @@ function dashboard() {
 
   function changeMonth(isPrev) {
     let [year, month] = dateSpecify.split('-').map(Number);
-    const now = new Date();
-    const year_now = now.getFullYear();
-    const month_now = now.getMonth() + 1;
+    
 
     if (!dateSpecify && isPrev) {
       year = year_now

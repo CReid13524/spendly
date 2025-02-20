@@ -29,7 +29,7 @@ const CategoryCarousel = ({headerToggle}) => {
       } else {
         setCardData(data.data)
         if (data.data.length === 0) {
-          setLimitText("Click 'Add' to start designing some categories! Then use 'Quick Add' to categorise your transactions!")
+          setLimitText("Select 'Create Category' to start designing some categories! Then use 'Quick Add' to categorise your transactions!")
         }
       }
     } catch (error) {

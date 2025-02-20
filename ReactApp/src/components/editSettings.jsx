@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import Select from 'react-select'
 import { GoogleLogin } from '@react-oauth/google';
 import bcrypt from "bcryptjs-react";
+import { useNavigate } from 'react-router-dom';
 
 function DeleteCSV() {
   const [userData, setUserData] = useState({})
@@ -9,6 +10,7 @@ function DeleteCSV() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState('')
   const [passwordNew, setPasswordNew] = useState('')
+  const navigate = useNavigate();
 
 
   function handleError(error) {
@@ -101,7 +103,9 @@ function DeleteCSV() {
       if (!response.ok) {
         throw data.error
       } else {
-        window.location.reload()
+        alert("Account deleted successfully")
+        navigate('/login')
+        
       }
     } catch (error) {
       handleError(error)
