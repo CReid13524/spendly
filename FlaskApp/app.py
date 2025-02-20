@@ -16,7 +16,7 @@ app.config['SECURE_KEY'] = os.getenv('SECURE_KEY')
 app.config['GOOGLE_CLIENT_ID'] = os.getenv('GOOGLE_CLIENT_ID')
 
 def get_db():
-    database = r'FlaskApp\spendly.db'
+    database = r'..\spendly\FlaskApp\spendly.db'
     db = sqlite3.connect(database)
     return db.cursor()
 
@@ -158,7 +158,7 @@ class Secure(Resource):
     def create_auth_token(self, verified, userID):
         if verified:
             curr = get_db()
-            curr.execute('Update User Set lastLogin = CURRENT_TIMESTAMP where userID=userID')
+            curr.execute('Update User Set lastLogin = CURRENT_TIMESTAMP where userID=?',(userID,))
             curr.connection.commit()
 
             payload = {
@@ -525,4 +525,4 @@ class Categories(Resource):
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000, host='0.0.0.0')
+    app.run(debug=True, port=5001, host='0.0.0.0')
