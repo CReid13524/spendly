@@ -157,6 +157,10 @@ class User(Resource):
 class Secure(Resource):
     def create_auth_token(self, verified, userID):
         if verified:
+            curr = get_db()
+            curr.execute('Update User Set lastLogin = CURRENT_TIMESTAMP where userID=userID')
+            curr.connection.commit()
+
             payload = {
                     'userID':userID,
                     'exp': (datetime.datetime.now() + datetime.timedelta(hours=1)).timestamp()
