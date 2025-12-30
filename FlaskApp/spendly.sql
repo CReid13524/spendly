@@ -1,5 +1,5 @@
 -- Create User table
-CREATE TABLE User (
+CREATE TABLE IF NOT EXISTS User (
     userID INTEGER PRIMARY KEY AUTOINCREMENT,
     email TEXT NULL,
     googleEmail TEXT NULL,
@@ -12,17 +12,20 @@ CREATE TABLE User (
 );
 
 -- Create Category table
-CREATE TABLE Category (
+CREATE TABLE IF NOT EXISTS Category (
     categoryID INTEGER PRIMARY KEY AUTOINCREMENT,
     userID INTEGER NOT NULL,
     name TEXT NOT NULL,
     colour TEXT,
     icon TEXT,
+    isHidden boolean default 0,
+    isIncome boolean default 0,
+    isDefault boolean default 0,
     FOREIGN KEY (userID) REFERENCES User(userID) ON DELETE CASCADE
 );
 
 -- Create Transactions table
-CREATE TABLE Transactions (
+CREATE TABLE IF NOT EXISTS Transactions (
     transactionID INTEGER PRIMARY KEY AUTOINCREMENT,
     uploadID INTEGER NOT NULL,
     categoryID INTEGER,
@@ -38,7 +41,7 @@ CREATE TABLE Transactions (
     FOREIGN KEY (categoryID) REFERENCES Category(categoryID) ON DELETE SET NULL
 );
 
-create table Upload(
+create TABLE IF NOT EXISTS Upload (
     uploadID INTEGER PRIMARY KEY AUTOINCREMENT,
     userID INTEGER NOT NULL,
     date TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,

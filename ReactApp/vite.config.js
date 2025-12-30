@@ -9,7 +9,7 @@ export default defineConfig({
     proxy: {
       // Proxy all requests starting with '/api' to backend server
       '/api': {
-        target: 'http://192.168.1.69:5000',
+        target: 'http://127.0.0.1:5000',
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace(/^\/api/, ''),  

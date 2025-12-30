@@ -8,17 +8,28 @@ from google.auth.transport import requests
 import pandas as pd
 import json
 
+def create_app():
+    app = Flask(__name__)
+    api = Api(app)
+    load_dotenv(r"FlaskApp\.env")
+    app.config['SECURE_KEY'] = os.getenv('SECURE_KEY')
+    app.config['GOOGLE_CLIENT_ID'] = os.getenv('GOOGLE_CLIENT_ID')
+    with open(r"FlaskApp\spendly.sql") as sql_file:
+        s = sql_file.read()
+    curr = get_db()
+    curr.executescript(s)
+    curr.connection.commit()
+    curr.connection.close()
+    return app, api
 
-app = Flask(__name__)
-api = Api(app)
-load_dotenv()
-app.config['SECURE_KEY'] = os.getenv('SECURE_KEY')
-app.config['GOOGLE_CLIENT_ID'] = os.getenv('GOOGLE_CLIENT_ID')
 
 def get_db():
     database = r'..\spendly\FlaskApp\spendly.db'
     db = sqlite3.connect(database)
     return db.cursor()
+
+app, api = create_app()
+
 
 def get_auth_data():
         token = request.cookies.get('auth_token')
@@ -205,6 +216,7 @@ class Secure(Resource):
                 cred = data['credential']
                 id_info = id_token.verify_oauth2_token(cred, requests.Request(), app.config['GOOGLE_CLIENT_ID'])
                 if id_info['aud'] != app.config['GOOGLE_CLIENT_ID']:
+                    print(id_info['aud'], app.config['GOOGLE_CLIENT_ID'])
                     raise ValueError('Could not verify audience.')
                 else:
                     verified=True
