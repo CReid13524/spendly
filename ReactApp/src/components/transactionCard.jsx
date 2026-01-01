@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import TransactionModal from './transactionModal'
+import TransactionModal from './transactionModal.tsx'
 import { LuCircleDashed } from "react-icons/lu";
 
 function TransactionCard({ data, onClick, onClose, handleDelete, handleCategoryUpdate, categoryData, staticColor}) {
