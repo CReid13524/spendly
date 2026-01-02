@@ -18,13 +18,14 @@ function NavigationBar() {
   const currentPath = location.pathname;
 
     return (
-      <div id="nav-container">
-      <nav id="nav-panel">
-          <div className={`nav-item ${currentPath === "/" ? "active" : ""}`}><Link to="/" >{currentPath === "/" ? <AiOutlineHome/> : <AiFillHome />}</Link>Dashboard</div>
-          <div className={`nav-item ${currentPath === "/categories" ? "active" : ""}`}><Link to="/categories">{currentPath === "/categories" ? <BiCategory/> : <BiSolidCategory />}</Link>Categories</div>
-          <div className={`nav-item ${currentPath === "/reconcile" ? "active" : ""}`}><Link to="/reconcile">{currentPath === "/reconcile" ? <AiOutlineBook/> : <AiFillBook />}</Link>Reconcile</div>
-          <div className={`nav-item ${currentPath === "/statistics" ? "active" : ""}`}><Link to="/statistics">{currentPath === "/statistics" ? <RiBarChart2Line/> : <RiBarChart2Fill />}</Link>Statistics</div>
-          <div className={`nav-item ${currentPath === "/settings" ? "active" : ""}`}><Link to="/settings">{currentPath === "/settings" ? <AiOutlineSetting/> : <AiFillSetting />}</Link>Settings</div>
+      <div className="nav-container">
+      <nav className="nav-panel">
+          <div className='logo'>S</div>
+          <div data-label="Home" className={`nav-item ${currentPath === "/" ? "active" : ""}`}><Link to="/" >{currentPath === "/" ? <AiFillHome /> : <AiOutlineHome/>}</Link></div>
+          <div data-label="Categories" className={`nav-item ${currentPath === "/categories" ? "active" : ""}`}><Link to="/categories">{currentPath === "/categories" ? <BiSolidCategory/> : <BiCategory/>}</Link></div>
+          <div data-label="Reconcile" className={`nav-item ${currentPath === "/reconcile" ? "active" : ""}`}><Link to="/reconcile">{currentPath === "/reconcile" ? <AiFillBook /> : <AiOutlineBook/>}</Link></div>
+          <div data-label="Statistics" className={`nav-item ${currentPath === "/statistics" ? "active" : ""}`}><Link to="/statistics">{currentPath === "/statistics" ? <RiBarChart2Fill /> : <RiBarChart2Line/>}</Link></div>
+          <div data-label="Settings" className={`nav-item bottom ${currentPath === "/settings" ? "active" : ""}`}><Link to="/settings">{currentPath === "/settings" ? <AiFillSetting /> : <AiOutlineSetting/>}</Link></div>
       </nav>
       </div>
     );

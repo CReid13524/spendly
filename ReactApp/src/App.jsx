@@ -69,14 +69,20 @@ function App() {
     
     }, [location.pathname, navigate]);
 
+  useEffect(() => {
+    document.body.dataset.layout = !hideNav && appData ? "nav" : "clean";
+    // document.body.dataset.theme = "dark";
+  }, [hideNav, appData]);
+
+
   return (
-    <>
+    <div className='router-container'>
       {!hideNav && appData && <NavigationBar/>}
       <Routes>
           <Route path="/login" element={<Login />} />
           {appData}
       </Routes>
-    </>
+    </div>
   )
 }
 
