@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import PageHeader from '../components/pageHeader'
 import UploadCSV from '../components/uploadCSV'
 import DeleteCSV from '../components/deleteCSV'
 import EditSettings from '../components/editSettings'
@@ -11,7 +10,6 @@ function settings() {
   return (
     <div id='settings-container'>
       <div id='settings-page'>
-        <PageHeader/>
         <div id="page-title">Settings</div>
         <div id="page-section">Transaction Data</div>
         <div id="section-info">Upload CSV  <button onClick={() => setHelpTextCSV((e) => !e)}>Help</button>

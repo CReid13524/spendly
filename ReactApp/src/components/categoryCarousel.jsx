@@ -3,7 +3,7 @@ import "./categoryCarousel.scss"
 import CategoryCard from "./categoryCard";
 import CreateCategory from './createCategory'
 
-const CategoryCarousel = ({headerToggle}) => {
+const CategoryCarousel = () => {
   const [error, setError] = useState(<></>)
   const [cardData, setCardData] = useState([])
   const [limitText, setLimitText] = useState('')
@@ -69,7 +69,7 @@ const CategoryCarousel = ({headerToggle}) => {
       <CreateCategory onSubmit={createCategory}/>
       
     {cardData.map((card) => (
-        <CategoryCard key={card.categoryID} data={card} onClick={headerToggle} onClose={headerToggle} handleError={handleError} onUpdate={() => setRefreshState(!refreshState)}/>
+        <CategoryCard key={card.categoryID} data={card} handleError={handleError} onUpdate={() => setRefreshState(!refreshState)}/>
         ))}
       <div className="limit-reached-text">{limitText}</div>
     </div>

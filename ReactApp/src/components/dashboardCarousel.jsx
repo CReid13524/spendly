@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import TransactionCarousel from "./transactionCarousel";
 
 
-function DashboardCarousel({headerToggle, onChange, dateSpecify}) {
+function DashboardCarousel({onChange, dateSpecify}) {
   const [error, setError] = useState(<></>)
   const [cardData, setCardData] = useState([])
   const [limitText, setLimitText] = useState('')
@@ -73,7 +73,7 @@ function DashboardCarousel({headerToggle, onChange, dateSpecify}) {
   return (
     <>
     {error}
-    <TransactionCarousel cardDataParam={cardData} fetchExcess={fetchExcess} onModalClose={onChange} headerToggle={headerToggle} limitText={limitText} handleError={handleError} dateSpecifyParam={dateSpecify}/>
+    <TransactionCarousel cardDataParam={cardData} fetchExcess={fetchExcess} onModalClose={onChange} limitText={limitText} handleError={handleError} dateSpecifyParam={dateSpecify}/>
     </>
   );
 

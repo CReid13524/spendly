@@ -2,17 +2,15 @@ import React, { useState } from 'react'
 import CategoryModal from './categoryModal'
 import { LuCircleDashed } from "react-icons/lu";
 
-function CategoryCard({ data, onClick, onClose, handleError, onUpdate}) {
+function CategoryCard({ data, handleError, onUpdate}) {
     const [isModalOpen, setIsModalOpen] = useState(false)
 
     function handleClick() {
-        onClick(data.categoryID)
         setIsModalOpen(true)
     }
 
     function handleClose() {
         setIsModalOpen(false)
-        onClose()
     }
 
     return (

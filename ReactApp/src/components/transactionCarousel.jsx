@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import "./transactionCarousel.scss";
 import TransactionCard from "./transactionCard";
 
-function TransactionCarousel({cardDataParam, fetchExcess, onModalClose=() => {}, headerToggle=() => {}, limitText, handleError, staticColor=null, onCategoryUpdate=() => {}, dateSpecifyParam=null}) {
+function TransactionCarousel({cardDataParam, fetchExcess, onModalClose=() => {}, limitText, handleError, staticColor=null, onCategoryUpdate=() => {}, dateSpecifyParam=null}) {
   const [cardData, setCardData] = useState([])
   const isFetching = useRef(false);
   const containerRef = useRef(null);
@@ -107,12 +107,10 @@ function TransactionCarousel({cardDataParam, fetchExcess, onModalClose=() => {},
     
       function handleClick(e) {
         setSelectedCardID(e)
-        headerToggle()
       }
     
       function handleModalClose() {
         setSelectedCardID(null)
-        headerToggle()
           onModalClose()
       }
       

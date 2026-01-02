@@ -1,21 +1,15 @@
 import React, { useState } from 'react'
 import DashboardChart from '../components/dashboardChart'
 import DashboardCarousel from '../components/dashboardCarousel'
-import PageHeader from '../components/pageHeader'
 import { IoChevronForwardCircle } from "react-icons/io5";
 import { IoChevronBackCircle } from "react-icons/io5";
 
 function dashboard() {
-  const [headerEnabled, setHeaderEnabled] = useState(true)
   const [refreshOnState, setRefreshOnState] = useState(false)
   const now = new Date();
   const year_now = now.getFullYear();
   const month_now = now.getMonth() + 1;
   const [dateSpecify, setDateSpecify] = useState(`${year_now}-${String(month_now).padStart(2, '0')}`)
-
-  function test() {
-    setHeaderEnabled(!headerEnabled)
-  }
 
   async function onCarouselChange() {
     await new Promise(resolve => setTimeout(resolve, 100));
@@ -57,7 +51,6 @@ function dashboard() {
     <div id='dashboard-container'>
       <div id='transactionModalPortal'></div>
       <div id='dashboard-page'>
-        {headerEnabled ? <PageHeader/> : <></>}
         <DashboardChart refreshOnState={refreshOnState} dateSpecify={dateSpecify}/>
         <div id='date-select'>
           <IoChevronBackCircle onClick={() => changeMonth(true)}/>
@@ -65,7 +58,7 @@ function dashboard() {
           : 'All Time'}
           <IoChevronForwardCircle onClick={() => changeMonth(false)}/>
         </div>
-        <DashboardCarousel headerToggle={test} onChange={onCarouselChange} dateSpecify={dateSpecify}/>
+        <DashboardCarousel onChange={onCarouselChange} dateSpecify={dateSpecify}/>
       </div>
     </div>
   )
