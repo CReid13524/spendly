@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import "./categoryCarousel.css"
+import "./categoryCarousel.scss"
 import CategoryCard from "./categoryCard";
 import CreateCategory from './createCategory'
 

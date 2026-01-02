@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import "./transactionCarousel.css";
+import "./transactionCarousel.scss";
 import TransactionCard from "./transactionCard";
 
 function TransactionCarousel({cardDataParam, fetchExcess, onModalClose=() => {}, headerToggle=() => {}, limitText, handleError, staticColor=null, onCategoryUpdate=() => {}, dateSpecifyParam=null}) {

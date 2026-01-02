@@ -1,6 +1,6 @@
 import { BrowserRouter } from 'react-router-dom';
 import { StrictMode } from 'react'
-import './index.css'
+import './index.scss'
 import App from './App.jsx'
 import ReactDOM from 'react-dom/client';
 import { GoogleOAuthProvider } from "@react-oauth/google";
