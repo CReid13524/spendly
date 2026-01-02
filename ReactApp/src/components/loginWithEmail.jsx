@@ -13,7 +13,7 @@ function LoginWithEmail() {
     const navigate = useNavigate();
 
     async function authenticate(email, password) {
-        const response = await fetch('/api/secure', {
+        const response = await fetch('/api/authentication', {
             method: 'POST',
             headers:  {'Content-Type' : 'application/json'},
             body: JSON.stringify({"type":'user', "email":email, "password":password})
@@ -26,7 +26,7 @@ function LoginWithEmail() {
 
     async function handleLogin() {
         try {
-            const response = await fetch(`/api/secure/${email}`, {
+            const response = await fetch(`/api/authentication/${email}`, {
                 method: 'GET'
             });
             const data = await response.json();

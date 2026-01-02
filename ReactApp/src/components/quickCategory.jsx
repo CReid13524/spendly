@@ -30,7 +30,7 @@ function QuickCategory({ headerToggle}) {
 
   async function getTransactionData() {
     try {
-      const response = await fetch(`/api/record_data/0/null`, {method: 'GET'});
+      const response = await fetch(`/api/transactions/0/null`, {method: 'GET'});
       const data = await response.json();
       if (!response.ok) {
           throw data.error
@@ -47,7 +47,7 @@ function QuickCategory({ headerToggle}) {
 
   async function fetchExcess() {
     try {
-      const response = await fetch(`/api/record_data/${cardData.length}/null`, {method: 'GET'});
+      const response = await fetch(`/api/transactions/${cardData.length}/null`, {method: 'GET'});
       const data = await response.json();
       if (!response.ok) {
           throw data.error
@@ -65,7 +65,7 @@ function QuickCategory({ headerToggle}) {
 
   async function handleDelete(transactionID) {
     try {
-      const response = await fetch('/api/record_data', {
+      const response = await fetch('/api/transactions', {
         method: 'DELETE',
         headers:  {'Content-Type' : 'application/json'},
         body: JSON.stringify({"transactionID":transactionID})
@@ -106,7 +106,7 @@ function QuickCategory({ headerToggle}) {
 
   async function handleCategoryUpdate(transactionID, categoryID) {
     try {
-      const response = await fetch('/api/record_data', {
+      const response = await fetch('/api/transactions', {
         method: 'PUT',
         headers:  {'Content-Type' : 'application/json'},
         body: JSON.stringify({"transactionID":transactionID, "categoryID":categoryID})

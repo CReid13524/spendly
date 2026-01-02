@@ -14,7 +14,7 @@ function DeleteCSV() {
       return
     }
     try {
-      const response = await fetch('/api/record_data_mass_delete', {
+      const response = await fetch('/api/transactions_mass_delete', {
         method: 'DELETE',
         headers:  {'Content-Type' : 'application/json'},
         body: JSON.stringify({uploadID:selectedOption.value})
@@ -42,7 +42,7 @@ function DeleteCSV() {
 
   async function getUploadData() {
     try {
-      const response = await fetch('/api/record_data_mass_delete', {
+      const response = await fetch('/api/transactions_mass_delete', {
         method: 'GET',
       });
 

@@ -25,7 +25,7 @@ function App() {
     // Run auth verification only if not on the login page
       const verifyAuth = async (quick=false) => {
         try {
-          const response = await fetch('/api/secure', {
+          const response = await fetch('/api/authentication', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',

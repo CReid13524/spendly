@@ -26,7 +26,7 @@ function CategoryModal({open, categoryData, onClose, handleError, onUpdate}) {
     async function getTransactionData() {
         
         try {
-          const response = await fetch(`/api/record_data/0/${categoryData.categoryID}`, {method: 'GET'});
+          const response = await fetch(`/api/transactions/0/${categoryData.categoryID}`, {method: 'GET'});
           const data = await response.json();
           if (!response.ok) {
               throw data.error
@@ -50,7 +50,7 @@ function CategoryModal({open, categoryData, onClose, handleError, onUpdate}) {
       
       async function fetchExcess(isFetching) {
         try {
-          const response = await fetch(`/api/record_data/${cardDataRef.current.length}/${categoryData.categoryID}`, {method: 'GET'});
+          const response = await fetch(`/api/transactions/${cardDataRef.current.length}/${categoryData.categoryID}`, {method: 'GET'});
           const data = await response.json();
           if (!response.ok) {
               throw data.error

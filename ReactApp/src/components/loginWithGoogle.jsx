@@ -8,7 +8,7 @@ function LoginWithGoogle() {
 
   async function handleLogin(res) {
     try {
-      const response = await fetch('/api/secure', {
+      const response = await fetch('/api/authentication', {
         method: 'POST',
         headers: {'Content-Type' : 'application/json'},
         body: JSON.stringify({'type': 'cred', 'credential' : res.credential})

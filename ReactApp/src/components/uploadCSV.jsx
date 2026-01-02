@@ -16,7 +16,7 @@ function UploadCSV() {
     formData.append('data', JSON.stringify({ "bank": selectedOption.value }));
 
     try {
-      const response = await fetch('/api/record_data', {
+      const response = await fetch('/api/transactions', {
         method: 'POST',
         body: formData,
       });

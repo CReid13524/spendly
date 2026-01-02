@@ -23,7 +23,7 @@ function DashboardCarousel({headerToggle, onChange, dateSpecify}) {
   async function getTransactionData() {
     
     try {
-      const response = await fetch(`/api/record_data${dateSpecify ? '_filter' : ''}/0${dateSpecify ? `/${dateSpecify}` : ''}`, {method: 'GET'});
+      const response = await fetch(`/api/transactions${dateSpecify ? '_filter' : ''}/0${dateSpecify ? `/${dateSpecify}` : ''}`, {method: 'GET'});
       const data = await response.json();
       if (!response.ok) {
           throw data.error
@@ -45,7 +45,7 @@ function DashboardCarousel({headerToggle, onChange, dateSpecify}) {
   async function fetchExcess(isFetching, dateSpecify) {
     try {
       
-      const response = await fetch(`/api/record_data${dateSpecify ? '_filter' : ''}/${cardDataRef.current.length}${dateSpecify ? `/${dateSpecify}` : ''}`, {method: 'GET'});
+      const response = await fetch(`/api/transactions${dateSpecify ? '_filter' : ''}/${cardDataRef.current.length}${dateSpecify ? `/${dateSpecify}` : ''}`, {method: 'GET'});
       
       const data = await response.json();
       if (!response.ok) {

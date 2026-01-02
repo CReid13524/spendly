@@ -43,7 +43,7 @@ function TransactionCarousel({cardDataParam, fetchExcess, onModalClose=() => {},
 
       async function handleDelete(transactionID) {
         try {
-          const response = await fetch('/api/record_data', {
+          const response = await fetch('/api/transactions', {
             method: 'DELETE',
             headers:  {'Content-Type' : 'application/json'},
             body: JSON.stringify({"transactionID":transactionID})
@@ -87,7 +87,7 @@ function TransactionCarousel({cardDataParam, fetchExcess, onModalClose=() => {},
     
       async function handleCategoryUpdate(transactionID, categoryID) {
         try {
-          const response = await fetch('/api/record_data', {
+          const response = await fetch('/api/transactions', {
             method: 'PUT',
             headers:  {'Content-Type' : 'application/json'},
             body: JSON.stringify({"transactionID":transactionID, "categoryID":categoryID})
