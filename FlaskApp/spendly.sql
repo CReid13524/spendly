@@ -8,7 +8,8 @@ CREATE TABLE IF NOT EXISTS User (
     password TEXT  NULL,
     name TEXT NULL,
     dateCreated TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    lastLogin TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    lastLogin TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    status TEXT NOT NULL DEFAULT 'active'
 );
 
 -- Create Category table
@@ -21,6 +22,7 @@ CREATE TABLE IF NOT EXISTS Category (
     isHidden boolean default 0,
     isIncome boolean default 0,
     isDefault boolean default 0,
+    status TEXT NOT NULL DEFAULT 'active',
     FOREIGN KEY (userID) REFERENCES User(userID) ON DELETE CASCADE
 );
 

@@ -1,3 +1,4 @@
 webhook.py
 ServiceLogs
-.vscode/settings.json
+.vscode/
+*.env
