@@ -7,12 +7,12 @@ def get_transactions(userID, count, categoryID, date):
         curr = get_db()
         hidden_filter = ["LEFT Join Category on Transactions.categoryID = Category.categoryID", "AND (isHidden=0 OR isHidden IS NULL)"]
         category_filter = (f'AND Transactions.categoryID'\
-            f'{'is NULL' if categoryID=='null' else f'= {categoryID}'}'
+            f'{'is NULL' if categoryID==None else f'= {categoryID}'}'
             if categoryID else '')
         date_filter = (f"AND strftime('%Y-%m', Transactions.date) = '{date}'"
                        if date else '')
-        
-        curr.execute(f"""select transactionID, title, Transactions.categoryID, type, details, particulars, code, reference, amount, Transactions.date
+
+        curr.execute(f"""select transactionID, title, Transactions.categoryID, type, details, particulars, code, reference, amount, Transactions.date, latitude, longitude
                         From Transactions
                         Inner Join Upload on Upload.uploadID = Transactions.uploadID
                         {hidden_filter[0] if not category_filter else ''}
@@ -68,10 +68,10 @@ def upload_csv(file, userID, bank):
         
         # Handle ANZ CSV
         if bank == 'anz':
-            upload_csv_anz(df)
+            df = upload_csv_anz(df)
         # Handle Kiwibank 'FULL CSV'
         elif bank == 'kiwibank':
-            upload_csv_kiwibank(df)
+            df = upload_csv_kiwibank(df)
 
         #Insert Data
         df.to_sql('Transactions', curr.connection, if_exists='append', index=False)
@@ -112,6 +112,8 @@ def upload_csv_kiwibank(df):
     #Apply Date Formatting
     df['date'] = pd.to_datetime(df['date'], format='%d-%m-%Y', errors='coerce').dt.strftime('%Y-%m-%d')
 
+    return df
+
 def upload_csv_anz(df):
     df.rename(columns={
         'Type': 'type',
@@ -129,6 +131,8 @@ def upload_csv_anz(df):
     
     #Apply Date Formatting
     df['date'] = pd.to_datetime(df['date'], format='%d/%m/%Y', errors='coerce').dt.strftime('%Y-%m-%d')
+
+    return df
 
 def update_category(transactionID, categoryID):
     try:

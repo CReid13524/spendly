@@ -1,6 +1,7 @@
 from flask import request
 from flask_restx import Resource
 from FlaskApp.transactions.services import get_user_from_token, get_transactions, upload_csv, update_category, delete_transaction, get_uploads_by_id, delete_upload
+import json
 
 class Transaction(Resource):
     def get(self, count=0, categoryID=None, date=None):
@@ -24,7 +25,10 @@ class Transaction(Resource):
         if e:
             return {'error': e}, 500
         file = request.files['file']
-        data = request.get_json()
+        raw_data = request.form.get('data')
+        if raw_data is None:
+            return {"error": "Missing data field"}, 400
+        data = json.loads(raw_data)
         if 'file' not in request.files:
             return {'error': 'No file part'}, 400
         if file.filename == '':
