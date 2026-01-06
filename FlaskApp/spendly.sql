@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS Category (
     icon TEXT,
     isHidden boolean default 0,
     isIncome boolean default 0,
-    isDefault boolean default 0,
+    isDefault boolean default 1,
     status TEXT NOT NULL DEFAULT 'active',
     FOREIGN KEY (userID) REFERENCES User(userID) ON DELETE CASCADE
 );
@@ -39,6 +39,8 @@ CREATE TABLE IF NOT EXISTS Transactions (
     amount REAL NOT NULL,
     date TEXT NOT NULL,
     title TEXT NOT NULL,
+    latitude REAL,
+    longitude REAL,
     FOREIGN KEY (uploadID) REFERENCES Upload(uploadID) ON DELETE CASCADE,
     FOREIGN KEY (categoryID) REFERENCES Category(categoryID) ON DELETE SET NULL
 );

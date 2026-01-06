@@ -6,11 +6,13 @@ import Dashboard from './pages/dashboard'
 import Categories from './pages/categories'
 import Reconcile from './pages/reconcile'
 import Statistics from './pages/statistics'
+import Map from './pages/map'
 import Settings from './pages/settings'
 import NotFound from './pages/notFound'
 import LoadingAnimated from './components/loadingAnimated'
 import NavigationBar from './components/navigationBar'
 import Help from './pages/help'
+import { ThemeProvider } from './components/theme-context'
 
 
 
@@ -45,6 +47,7 @@ function App() {
               <Route path="/categories" element={<Categories />} />
               <Route path="/reconcile" element={<Reconcile />} />
               <Route path="/statistics" element={<Statistics />} />
+              <Route path="/map" element={<Map />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="*" element={<NotFound />} />
               <Route path="/help" element={<Help />} />
@@ -71,18 +74,19 @@ function App() {
 
   useEffect(() => {
     document.body.dataset.layout = !hideNav && appData ? "nav" : "clean";
-    // document.body.dataset.theme = "dark";
   }, [hideNav, appData]);
 
 
   return (
-    <div className='router-container'>
-      {!hideNav && appData && <NavigationBar/>}
-      <Routes>
-          <Route path="/login" element={<Login />} />
-          {appData}
-      </Routes>
-    </div>
+    <ThemeProvider>
+      <div className='router-container'>
+        {!hideNav && appData && <NavigationBar/>}
+        <Routes>
+            <Route path="/login" element={<Login />} />
+            {appData}
+        </Routes>
+      </div>
+    </ThemeProvider>
   )
 }
 

@@ -10,7 +10,7 @@ function settings() {
   return (
     <div id='settings-container'>
       <div id='settings-page'>
-        <div id="page-title">Settings</div>
+        <div className="page-title">Settings</div>
         <div id="page-section">Transaction Data</div>
         <div id="section-info">Upload CSV  <button onClick={() => setHelpTextCSV((e) => !e)}>Help</button>
         </div>

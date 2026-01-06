@@ -27,5 +27,10 @@ def create_app():
     api.add_resource(Transaction, '/transactions', '/transactions/<int:count>/<string:categoryID>', '/transactions/<int:count>','/transactions_filter/<int:count>/<string:date>','/transactions_mass_delete')
     from .categories import Category
     api.add_resource(Category, '/categories','/categories/<string:advanced>','/categories/<string:advanced>/<string:date>')
+    from .map import Map
+    api.add_resource(Map, '/map')
+    from .search import Search
+    api.add_resource(Search, '/search')
+
 
     return app, api

@@ -4,7 +4,7 @@ function statistics() {
   return (
     <div id='statistics-container'>
       <div id='statistics-page'>
-        <div id="page-title">Statistics</div>
+        <div className="page-title">Statistics</div>
         <div id='page-notification'>To come in future releases</div>
       </div>
     </div>

@@ -5,18 +5,19 @@ import pandas as pd
 def get_transactions(userID, count, categoryID, date):
     try:
         curr = get_db()
-        hidden_filter = ["LEFT Join Category on Transactions.categoryID = Category.categoryID", "AND (isHidden=0 OR isHidden IS NULL)"]
+        hidden_filter = "AND (isHidden=0 OR isHidden IS NULL)"
         category_filter = (f'AND Transactions.categoryID'\
             f'{'is NULL' if categoryID==None else f'= {categoryID}'}'
             if categoryID else '')
         date_filter = (f"AND strftime('%Y-%m', Transactions.date) = '{date}'"
                        if date else '')
 
-        curr.execute(f"""select transactionID, title, Transactions.categoryID, type, details, particulars, code, reference, amount, Transactions.date, latitude, longitude
+        curr.execute(f"""select transactionID, title, Transactions.categoryID, type, details, particulars, code, reference, amount, Transactions.date, latitude, longitude,
+                        Category.colour, Category.icon
                         From Transactions
                         Inner Join Upload on Upload.uploadID = Transactions.uploadID
-                        {hidden_filter[0] if not category_filter else ''}
-                        Where Upload.userID = ? {category_filter if category_filter else hidden_filter[1]} {date_filter}
+                        LEFT Join Category on Transactions.categoryID = Category.categoryID
+                        Where Upload.userID = ? {category_filter if category_filter else hidden_filter} {date_filter}
                         Order By JULIANDAY(Transactions.date) DESC
                         Limit 50 OFFSET ?""", (userID,count))
         data = curr.fetchall()

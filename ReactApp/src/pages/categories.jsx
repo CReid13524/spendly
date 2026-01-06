@@ -12,7 +12,7 @@ function categories() {
     <div id="category-portal"></div>
     <div id='categories-page'>
       <div id='page-heading'>
-        <div id="page-title">Categories</div>
+        <div className="page-title">Categories</div>
         <button onClick={() => setQuickAddEnabled(!quickAddEnabled)}>
           Quick Add <RiApps2AddLine/>
         </button>
