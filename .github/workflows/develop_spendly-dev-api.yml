@@ -71,8 +71,9 @@ jobs:
         id: deploy-to-webapp
         with:
           app-name: 'spendly-dev-api'
-          package: FlaskApp
+          package: .
 
           
+
 
 
