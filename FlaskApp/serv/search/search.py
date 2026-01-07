@@ -1,6 +1,6 @@
 from flask import request
 from flask_restx import Resource
-from FlaskApp.search.services import get_transactions,get_user_from_token
+from FlaskApp.serv.search.services import get_transactions,get_user_from_token
 
 class Search(Resource):
     def get(self):

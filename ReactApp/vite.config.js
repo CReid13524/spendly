@@ -1,9 +1,15 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 // https://vite.dev/config/
 export default defineConfig({
+  build: {
+    outDir: 'dist'
+  },
   plugins: [
     react(),
     VitePWA({
@@ -11,33 +17,36 @@ export default defineConfig({
         enabled: true
       },
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg'],
+      workbox: {
+        maximumFileSizeToCacheInBytes: 4 * 1024 * 1024, // 4 MB
+      },
+      // includeAssets: ['favicon.svg'],
       manifest: {
         name: 'Spendly',
         short_name: 'Spendly',
         description: 'Cashflow & spending insights',
-        theme_color: '#0f172a',
-        background_color: '#0f172a',
+        theme_color: '#ffffff',
+        background_color: '#ffffff',
         display: 'standalone',
         start_url: '/',
-        icons: [
-          {
-            src: '/pwa-192x192.png',
-            sizes: '192x192',
-            type: 'image/png'
-          },
-          {
-            src: '/pwa-512x512.png',
-            sizes: '512x512',
-            type: 'image/png'
-          },
-          {
-            src: '/pwa-512x512.png',
-            sizes: '512x512',
-            type: 'image/png',
-            purpose: 'any maskable'
-          }
-        ]
+        // icons: [
+        //   {
+        //     src: '/pwa-192x192.png',
+        //     sizes: '192x192',
+        //     type: 'image/png'
+        //   },
+        //   {
+        //     src: '/pwa-512x512.png',
+        //     sizes: '512x512',
+        //     type: 'image/png'
+        //   },
+        //   {
+        //     src: '/pwa-512x512.png',
+        //     sizes: '512x512',
+        //     type: 'image/png',
+        //     purpose: 'any maskable'
+        //   }
+        // ]
       }
     })
   ],
@@ -46,10 +55,10 @@ export default defineConfig({
     proxy: {
       // Proxy all requests starting with '/api' to backend server
       '/api': {
-        target: 'http://127.0.0.1:5000',
+        target: process.env.VITE_API_ENDPOINT,
         changeOrigin: true,
         secure: false,
-        rewrite: (path) => path.replace(/^\/api/, ''),  
+        rewrite: (path) => path.replace(/^\/api/, ''), 
       },
     },
   }

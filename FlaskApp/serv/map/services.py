@@ -1,4 +1,4 @@
-from FlaskApp.services import get_db, get_user_from_token
+from FlaskApp.serv.services import get_db, get_user_from_token
 
 def updateTransactionCoordinates(transactionID, longitude, latitude):
     try:

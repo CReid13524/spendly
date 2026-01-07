@@ -1,4 +1,4 @@
-from FlaskApp.services import get_user_from_token, get_db
+from FlaskApp.serv.services import get_user_from_token, get_db
 
 def get_advanced_categories(date, userID):
     try:

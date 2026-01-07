@@ -1,4 +1,5 @@
 Flask
+gunicorn
 Flask-RESTX
 python-dotenv
 google-auth

@@ -1,6 +1,6 @@
 from flask import request
 from flask_restx import Resource
-from FlaskApp.categories.services import get_user_from_token, get_basic_categories, get_advanced_categories, create_category, update_category, delete_category
+from FlaskApp.serv.categories.services import get_user_from_token, get_basic_categories, get_advanced_categories, create_category, update_category, delete_category
 
 class Category(Resource):
     def get(self,advanced=False, date=''):

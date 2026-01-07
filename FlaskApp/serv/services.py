@@ -3,7 +3,7 @@ import jwt
 from flask import current_app
 
 def get_db():
-    database = r'spendly.db'
+    database = r'FlaskApp/spendly.db'
     db = sqlite3.connect(database)
     return db.cursor()
 

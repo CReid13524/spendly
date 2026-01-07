@@ -1,5 +1,5 @@
 import bcrypt
-from FlaskApp.services import get_user_from_token, get_db
+from FlaskApp.serv.services import get_user_from_token, get_db
 from flask import current_app
 from google.oauth2 import id_token
 

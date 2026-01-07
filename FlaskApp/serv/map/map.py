@@ -1,6 +1,6 @@
 from flask import request
 from flask_restx import Resource
-from FlaskApp.map.services import updateTransactionCoordinates, get_user_from_token,deleteTransactionCoordinates
+from FlaskApp.serv.map.services import updateTransactionCoordinates, get_user_from_token,deleteTransactionCoordinates
 
 
 class Map(Resource):

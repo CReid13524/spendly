@@ -2,7 +2,7 @@ import datetime
 import jwt
 from flask import make_response
 from flask import current_app
-from FlaskApp.services import get_db, get_user_from_token
+from FlaskApp.serv.services import get_db, get_user_from_token, get_auth_data
 from google.oauth2 import id_token
 import bcrypt
 

@@ -1,6 +1,6 @@
 from flask import request, make_response
 from flask_restx import Resource
-from FlaskApp.user.services import get_user_data, create_new_user, login_exisiting_user, get_user_from_token, reset_user_account, delete_user_account
+from FlaskApp.serv.user.services import get_user_data, create_new_user, login_exisiting_user, get_user_from_token, reset_user_account, delete_user_account
 from werkzeug.exceptions import HTTPException
 
 class User(Resource):

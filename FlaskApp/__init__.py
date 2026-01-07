@@ -2,16 +2,16 @@ from flask import Flask
 from flask_restx import Api
 import os
 from dotenv import load_dotenv
-from FlaskApp.services import get_db
+from FlaskApp.serv.services import get_db
 
 
 def create_app():
     app = Flask(__name__)
     api = Api(app)
-    load_dotenv(r".env")
+    load_dotenv(r"FlaskApp/.env")
     app.config['SECURE_KEY'] = os.getenv('SECURE_KEY')
     app.config['GOOGLE_CLIENT_ID'] = os.getenv('GOOGLE_CLIENT_ID')
-    with open(r"spendly.sql") as sql_file:
+    with open(r"FlaskApp/spendly.sql") as sql_file:
         s = sql_file.read()
     curr = get_db()
     curr.executescript(s)
@@ -19,17 +19,17 @@ def create_app():
     curr.connection.close()
 
     # Blueprints
-    from .user import User
+    from FlaskApp.serv.user import User
     api.add_resource(User, '/user')
-    from .authentication import Authentication
+    from FlaskApp.serv.authentication import Authentication
     api.add_resource(Authentication, '/authentication', '/authentication/<string:email>')
-    from .transactions import Transaction
+    from FlaskApp.serv.transactions import Transaction
     api.add_resource(Transaction, '/transactions', '/transactions/<int:count>/<string:categoryID>', '/transactions/<int:count>','/transactions_filter/<int:count>/<string:date>','/transactions_mass_delete')
-    from .categories import Category
+    from FlaskApp.serv.categories import Category
     api.add_resource(Category, '/categories','/categories/<string:advanced>','/categories/<string:advanced>/<string:date>')
-    from .map import Map
+    from FlaskApp.serv.map import Map
     api.add_resource(Map, '/map')
-    from .search import Search
+    from FlaskApp.serv.search import Search
     api.add_resource(Search, '/search')
 
 

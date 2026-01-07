@@ -1,7 +1,6 @@
 from flask import request
 from flask_restx import Resource
-from FlaskApp.services import get_auth_data
-from FlaskApp.authentication.services import check_user_exists, login_with_google, login_with_details
+from FlaskApp.serv.authentication.services import check_user_exists, login_with_google, login_with_details, get_auth_data
 
 
 class Authentication(Resource):

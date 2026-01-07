@@ -1,6 +1,6 @@
 from flask import request
 from flask_restx import Resource
-from FlaskApp.transactions.services import get_user_from_token, get_transactions, upload_csv, update_category, delete_transaction, get_uploads_by_id, delete_upload
+from FlaskApp.serv.transactions.services import get_user_from_token, get_transactions, upload_csv, update_category, delete_transaction, get_uploads_by_id, delete_upload
 import json
 
 class Transaction(Resource):
