@@ -1,0 +1,71 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
+name: Build and deploy Node.js app to Azure Web App - spendly-dev
+
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      - 'ReactApp/**'
+      - '.github/workflows/develop_spendly-dev.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.x'
+
+      - name: Install dependencies
+        working-directory: ReactApp
+        run: npm ci
+
+      - name: Build React app
+        working-directory: ReactApp
+        run: npm run build
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: react-dist
+          path: ReactApp/dist/*
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      id-token: write #This is required for requesting the JWT
+      contents: read #This is required for actions/checkout
+
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: react-dist
+          path: .
+      
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_2D7BB5976B594E18891F24B734115CD8 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_9DFAB092A5E44A4C85EDC298DF257678 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_4337B996ECCA4768A3AD99E5FCBF0DC0 }}
+
+      - name: 'Deploy to Azure Web App'
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'spendly-dev'
+          slot-name: 'Production'
+          package: .
+          
