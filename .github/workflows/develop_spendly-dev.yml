@@ -14,6 +14,7 @@ on:
 
 jobs:
   build:
+    environment: Develop
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -32,6 +33,10 @@ jobs:
 
       - name: Build React app
         working-directory: ReactApp
+        env:
+          VITE_API: ${{ secrets.VITE_API }}
+          VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
+          VITE_MAPBOX_ACCESS_TOKEN: ${{ secrets.VITE_MAPBOX_ACCESS_TOKEN }}
         run: npm run build
 
       - name: Upload artifact
