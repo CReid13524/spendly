@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import bcrypt from "bcryptjs-react";
 import { useNavigate } from 'react-router-dom';
+import { config } from '../config'
 
 function LoginWithEmail() {
     const [error, setError] = useState(<></>);
@@ -13,8 +14,9 @@ function LoginWithEmail() {
     const navigate = useNavigate();
 
     async function authenticate(email, password) {
-        const response = await fetch('/api/authentication', {
+        const response = await fetch(`${config.api}/authentication`, {
             method: 'POST',
+            credentials: 'include',
             headers:  {'Content-Type' : 'application/json'},
             body: JSON.stringify({"type":'user', "email":email, "password":password})
         });
@@ -26,7 +28,7 @@ function LoginWithEmail() {
 
     async function handleLogin() {
         try {
-            const response = await fetch(`/api/authentication/${email}`, {
+            const response = await fetch(`${config.api}/authentication/${email}`, {
                 method: 'GET'
             });
             const data = await response.json();
@@ -44,7 +46,7 @@ function LoginWithEmail() {
                 setIsAccount('N')
                 if (password1 && password2) {
                     const hashedPassword = bcrypt.hash(password1, 10)
-                    const response = await fetch('/api/user', {
+                    const response = await fetch(`${config.api}/user`, {
                         method: 'POST',
                         headers:  {'Content-Type' : 'application/json'},
                         body: JSON.stringify({"email":email, "password":await hashedPassword})

@@ -22,8 +22,8 @@ def create_auth_token(verified, userID):
             token,
             max_age=3600,
             httponly=True,
-            secure=False,
-            samesite='Strict'
+            secure=current_app.config['FLASK_ENVIRONMENT'] != 'local',
+            samesite='Lax' if current_app.config['FLASK_ENVIRONMENT'] == 'local' else "None"
         )
         return response
     else:

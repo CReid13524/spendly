@@ -10,6 +10,7 @@ import "dayjs/locale/en-gb";
 import { FaMapPin } from "react-icons/fa6";
 import { createTheme, ThemeProvider, Theme } from "@mui/material/styles";
 import { useTheme } from './theme-context'
+import { config } from '../config'
 
 interface TransactionCarouselBasicProps {
     setTransactionData: React.Dispatch<React.SetStateAction<any[]>>;
@@ -52,7 +53,10 @@ function TransactionCarouselBasic(props: TransactionCarouselBasicProps) {
         if (startDate && endDate) {
             params = new URLSearchParams({startDate:startDate.toISOString(), endDate:endDate.toISOString()});
         }
-        const response = await fetch(`/api/search?${params}`, {method: 'GET'});
+        const response = await fetch(`${config.api}/search?${params}`, {
+            method: 'GET',
+            credentials: "include",
+        });
         const data = await response.json();
         if (!response.ok) {
             throw data.error
@@ -66,9 +70,10 @@ function TransactionCarouselBasic(props: TransactionCarouselBasicProps) {
 
     async function updateSelectedTransaction(updatedTransaction: any) {
         try {
-        const response = await fetch(`/api/map`, {
+        const response = await fetch(`${config.api}/map`, {
             headers:  {'Content-Type' : 'application/json'},
             method: 'POST',
+            credentials: "include",
             body: JSON.stringify({...updatedTransaction})
         
         });
@@ -83,8 +88,9 @@ function TransactionCarouselBasic(props: TransactionCarouselBasicProps) {
 
     async function deleteSelectedTransaction(updatedTransaction: any) {
         try {
-        const response = await fetch(`/api/map`, {
+        const response = await fetch(`${config.api}/map`, {
             headers:  {'Content-Type' : 'application/json'},
+            credentials: "include",
             method: 'DELETE',
             body: JSON.stringify({...updatedTransaction})
         

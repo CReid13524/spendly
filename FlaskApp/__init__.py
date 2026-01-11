@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_restx import Api
+from flask_cors import CORS
 import os
 from dotenv import load_dotenv
 from FlaskApp.serv.services import get_db
@@ -8,9 +9,24 @@ from FlaskApp.serv.services import get_db
 def create_app():
     app = Flask(__name__)
     api = Api(app)
+    CORS(
+        app,
+        resources={
+            r"/*": {
+                "origins": [
+                    "http://127.0.0.1:8000",
+                    "https://spendly-dev.azurewebsites.net",
+                    "http://spendly-dev.azurewebsites.net"
+                ]
+            }
+        },
+        supports_credentials=True
+    )
+
     load_dotenv(r"FlaskApp/.env")
     app.config['SECURE_KEY'] = os.getenv('SECURE_KEY')
     app.config['GOOGLE_CLIENT_ID'] = os.getenv('GOOGLE_CLIENT_ID')
+    app.config['FLASK_ENVIRONMENT'] = os.getenv('FLASK_ENVIRONMENT','local')
     with open(r"FlaskApp/spendly.sql") as sql_file:
         s = sql_file.read()
     curr = get_db()

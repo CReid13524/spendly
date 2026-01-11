@@ -9,7 +9,7 @@ class Map(Resource):
         token = request.cookies.get('auth_token')
         e, _ = get_user_from_token(token)
         if e:
-            return {'error': e}, 500
+            return {'error': str(e)}, 500
         data = request.get_json()
         e = updateTransactionCoordinates(data['transactionID'], data['longitude'], data['latitude'])
         if e:
@@ -20,7 +20,7 @@ class Map(Resource):
         token = request.cookies.get('auth_token')
         e, _ = get_user_from_token(token)
         if e:
-            return {'error': e}, 500
+            return {'error': str(e)}, 500
         data = request.get_json()
         e, res = deleteTransactionCoordinates(data['transactionID'])
         if e:

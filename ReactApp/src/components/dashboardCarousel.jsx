@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import TransactionCarousel from "./transactionCarousel";
+import { config } from '../config'
 
 
 function DashboardCarousel({onChange, dateSpecify}) {
@@ -23,7 +24,10 @@ function DashboardCarousel({onChange, dateSpecify}) {
   async function getTransactionData() {
     
     try {
-      const response = await fetch(`/api/transactions${dateSpecify ? '_filter' : ''}/0${dateSpecify ? `/${dateSpecify}` : ''}`, {method: 'GET'});
+      const response = await fetch(`${config.api}/transactions${dateSpecify ? '_filter' : ''}/0${dateSpecify ? `/${dateSpecify}` : ''}`, {
+        method: 'GET',
+        credentials: "include",
+      });
       const data = await response.json();
       if (!response.ok) {
           throw data.error
@@ -45,7 +49,10 @@ function DashboardCarousel({onChange, dateSpecify}) {
   async function fetchExcess(isFetching, dateSpecify) {
     try {
       
-      const response = await fetch(`/api/transactions${dateSpecify ? '_filter' : ''}/${cardDataRef.current.length}${dateSpecify ? `/${dateSpecify}` : ''}`, {method: 'GET'});
+      const response = await fetch(`${config.api}/transactions${dateSpecify ? '_filter' : ''}/${cardDataRef.current.length}${dateSpecify ? `/${dateSpecify}` : ''}`, {
+        method: 'GET',
+        credentials: "include",
+      });
       
       const data = await response.json();
       if (!response.ok) {

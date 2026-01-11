@@ -4,6 +4,7 @@ import Select from 'react-select'
 import { IoChevronForwardCircle } from "react-icons/io5";
 import { IoChevronBackCircle } from "react-icons/io5";
 import { MdDelete } from 'react-icons/md';
+import { config } from '../config'
 
 
 function QuickCategory({ headerToggle}) {
@@ -30,7 +31,10 @@ function QuickCategory({ headerToggle}) {
 
   async function getTransactionData() {
     try {
-      const response = await fetch(`/api/transactions/0/null`, {method: 'GET'});
+      const response = await fetch(`${config.api}/transactions/0/null`, {
+        method: 'GET',
+        credentials: "include",
+      });
       const data = await response.json();
       if (!response.ok) {
           throw data.error
@@ -47,7 +51,10 @@ function QuickCategory({ headerToggle}) {
 
   async function fetchExcess() {
     try {
-      const response = await fetch(`/api/transactions/${cardData.length}/null`, {method: 'GET'});
+      const response = await fetch(`${config.api}/transactions/${cardData.length}/null`, {
+        method: 'GET',
+        credentials: "include",
+      });
       const data = await response.json();
       if (!response.ok) {
           throw data.error
@@ -65,9 +72,10 @@ function QuickCategory({ headerToggle}) {
 
   async function handleDelete(transactionID) {
     try {
-      const response = await fetch('/api/transactions', {
+      const response = await fetch(`${config.api}/transactions`, {
         method: 'DELETE',
         headers:  {'Content-Type' : 'application/json'},
+        credentials: "include",
         body: JSON.stringify({"transactionID":transactionID})
       });
       const data = await response.json();
@@ -106,9 +114,10 @@ function QuickCategory({ headerToggle}) {
 
   async function handleCategoryUpdate(transactionID, categoryID) {
     try {
-      const response = await fetch('/api/transactions', {
+      const response = await fetch(`${config.api}/transactions`, {
         method: 'PUT',
         headers:  {'Content-Type' : 'application/json'},
+        credentials: "include",
         body: JSON.stringify({"transactionID":transactionID, "categoryID":categoryID})
       });
       const data = await response.json();
@@ -156,7 +165,10 @@ const customStyles = {
 
   async function getCategoryData() {
     try {
-      const response = await fetch('/api/categories', {method: 'GET'});
+      const response = await fetch(`${config.api}/categories`, {
+        method: 'GET',
+        credentials: "include",
+      });
       const data = await response.json();
       if (!response.ok) {
           throw data.error

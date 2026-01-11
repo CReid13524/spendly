@@ -52,14 +52,5 @@ export default defineConfig({
   ],
   server: {
     port: 8000,
-    proxy: {
-      // Proxy all requests starting with '/api' to backend server
-      '/api': {
-        target: process.env.VITE_API_ENDPOINT,
-        changeOrigin: true,
-        secure: false,
-        rewrite: (path) => path.replace(/^\/api/, ''), 
-      },
-    },
   }
 })

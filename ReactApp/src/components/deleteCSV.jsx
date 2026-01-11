@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import Select from 'react-select'
+import { config } from '../config'
+
 
 function DeleteCSV() {
   const [isLoading, setIsLoading] = useState(false)
@@ -14,9 +16,10 @@ function DeleteCSV() {
       return
     }
     try {
-      const response = await fetch('/api/transactions_mass_delete', {
+      const response = await fetch(`${config.api}/transactions_mass_delete`, {
         method: 'DELETE',
         headers:  {'Content-Type' : 'application/json'},
+        credentials: "include",
         body: JSON.stringify({uploadID:selectedOption.value})
       });
 
@@ -42,8 +45,9 @@ function DeleteCSV() {
 
   async function getUploadData() {
     try {
-      const response = await fetch('/api/transactions_mass_delete', {
+      const response = await fetch(`${config.api}/transactions_mass_delete`, {
         method: 'GET',
+        credentials: "include",
       });
 
       const data = await response.json();

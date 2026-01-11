@@ -23,9 +23,10 @@ def get_user_from_token(token):
     try:
         auth_data = get_auth_data(token)
         if not auth_data[0]['valid']:
-            raise auth_data[0]['error']
+            raise Exception(auth_data[0]['error'])
         else:
             userID = auth_data[0]['user']
             return None, userID
     except Exception as e:
+        print(e)
         return e, None

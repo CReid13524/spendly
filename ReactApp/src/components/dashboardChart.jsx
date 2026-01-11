@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react'
 import Chart from 'chart.js/auto';
 import { AiOutlinePlus } from "react-icons/ai";
+import { config } from '../config'
+
 
 const DashboardChart = ({refreshOnState, dateSpecify}) => {
   const defaultCategory = {categoryID:0,name:'No Categories',icon:' ',amount:'-$0.01', colour:'#6062647a', isDefault:1, isHidden:0, isIncome:false}
@@ -23,7 +25,10 @@ const DashboardChart = ({refreshOnState, dateSpecify}) => {
   async function getCategoryData() {
     
     try {
-      const response = await fetch(`/api/categories/advanced${dateSpecify ? `/${dateSpecify}` : ''}`, {method: 'GET'});
+      const response = await fetch(`${config.api}/categories/advanced${dateSpecify ? `/${dateSpecify}` : ''}`, {
+        method: 'GET',
+        credentials: "include",
+      });
       const data = await response.json();
       if (!response.ok) {
           throw data.error

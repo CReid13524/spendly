@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import "./transactionCarousel.scss";
 import TransactionCard from "./transactionCard";
+import { config } from '../config'
 
 function TransactionCarousel({cardDataParam, fetchExcess, onModalClose=() => {}, limitText, handleError, staticColor=null, onCategoryUpdate=() => {}, dateSpecifyParam=null}) {
   const [cardData, setCardData] = useState([])
@@ -43,9 +44,10 @@ function TransactionCarousel({cardDataParam, fetchExcess, onModalClose=() => {},
 
       async function handleDelete(transactionID) {
         try {
-          const response = await fetch('/api/transactions', {
+          const response = await fetch(`${config.api}/transactions`, {
             method: 'DELETE',
             headers:  {'Content-Type' : 'application/json'},
+             credentials: "include",
             body: JSON.stringify({"transactionID":transactionID})
           });
           const data = await response.json();
@@ -69,7 +71,10 @@ function TransactionCarousel({cardDataParam, fetchExcess, onModalClose=() => {},
 
     async function getCategoryData() {
       try {
-        const response = await fetch('/api/categories', {method: 'GET'});
+        const response = await fetch(`${config.api}/categories`, {
+          method: 'GET',
+         credentials: "include",
+        });
         const data = await response.json();
         if (!response.ok) {
             throw data.error
@@ -87,9 +92,10 @@ function TransactionCarousel({cardDataParam, fetchExcess, onModalClose=() => {},
     
       async function handleCategoryUpdate(transactionID, categoryID) {
         try {
-          const response = await fetch('/api/transactions', {
+          const response = await fetch(`${config.api}/transactions`, {
             method: 'PUT',
             headers:  {'Content-Type' : 'application/json'},
+            credentials: "include",
             body: JSON.stringify({"transactionID":transactionID, "categoryID":categoryID})
           });
           const data = await response.json();

@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import "./categoryCarousel.scss"
 import CategoryCard from "./categoryCard";
 import CreateCategory from './createCategory'
+import { config } from '../config'
 
 const CategoryCarousel = () => {
   const [error, setError] = useState(<></>)
@@ -22,7 +23,10 @@ const CategoryCarousel = () => {
   async function getCategoryData() {
     
     try {
-      const response = await fetch('/api/categories/advanced', {method: 'GET'});
+      const response = await fetch(`${config.api}/categories/advanced`, {
+        method: 'GET',
+        credentials: "include"
+      });
       const data = await response.json();
       if (!response.ok) {
           throw data.error
@@ -40,9 +44,10 @@ const CategoryCarousel = () => {
   async function createCategory(name,color,icon) {
 
     try {
-      const response = await fetch('/api/categories', {
+      const response = await fetch(`${config.api}/categories`, {
         method: 'POST',
         headers:  {'Content-Type' : 'application/json'},
+        credentials: "include",
         body: JSON.stringify({"name":name,"color":color,"icon":icon})
       });
       const data = await response.json();

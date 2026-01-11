@@ -26,8 +26,9 @@ function DeleteCSV() {
 
   async function getUserData() {
     try {
-      const response = await fetch('/api/user', {
+      const response = await fetch(`${config.api}/user`, {
         method: 'GET',
+        credentials: "include",
       });
 
       const data = await response.json();
@@ -53,9 +54,10 @@ function DeleteCSV() {
     e.preventDefault()
       try {
         const hashedPasswrod = bcrypt.hash(passwordNew, 10)
-        const response = await fetch('/api/user', {
+        const response = await fetch(`${config.api}/user`, {
           method: 'PUT',
           headers:  {'Content-Type' : 'application/json'},
+          credentials: "include",
           body: JSON.stringify({type:'user', password:password, passwordNew: await hashedPasswrod})
         });
   
@@ -74,9 +76,10 @@ function DeleteCSV() {
 
   async function connectGoogle(credential) {
     try {
-      const response = await fetch('/api/user', {
+      const response = await fetch(`${config.api}/user`, {
         method: 'PUT',
         headers: {'Content-Type' : 'application/json'},
+        credentials: "include",
         body: JSON.stringify({'type': 'cred', 'credential' : credential})
       });
       const data = await response.json();
@@ -94,9 +97,10 @@ function DeleteCSV() {
 
     if (!window.confirm(`Are you sure? All account data will be ${type==='reset' ? 'reset. Login data will remain' : 'lost forever'}.`)) return
     try {
-      const response = await fetch('/api/user', {
+      const response = await fetch(`${config.api}/user`, {
         method: 'DELETE',
         headers: {'Content-Type' : 'application/json'},
+        credentials: "include",
         body: JSON.stringify({type: type})
       });
       const data = await response.json();

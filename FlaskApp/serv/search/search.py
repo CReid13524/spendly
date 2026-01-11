@@ -10,7 +10,7 @@ class Search(Resource):
 
         e, userid = get_user_from_token(token)
         if e:
-            return {'error': e}, 500
+            return {'error': str(e)}, 500
         e, res = get_transactions(userid, start_date, end_date)
         if e:
             return {'error': str(e)}, 500

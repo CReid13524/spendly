@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import Select from 'react-select'
 import { FaExternalLinkAlt } from "react-icons/fa";
+import { config } from '../config'
 
 function UploadCSV() {
   const [file, setFile] = useState()
@@ -16,8 +17,9 @@ function UploadCSV() {
     formData.append('data', JSON.stringify({ "bank": selectedOption.value }));
 
     try {
-      const response = await fetch('/api/transactions', {
+      const response = await fetch(`${config.api}/transactions`, {
         method: 'POST',
+        credentials: "include",
         body: formData,
       });
 

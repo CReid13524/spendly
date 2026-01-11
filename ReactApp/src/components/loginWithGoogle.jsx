@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { GoogleLogin } from '@react-oauth/google';
 import { useNavigate } from 'react-router-dom';
+import { config } from '../config'
 
 function LoginWithGoogle() {
   const [error, setError] = useState(<></>);
@@ -8,7 +9,7 @@ function LoginWithGoogle() {
 
   async function handleLogin(res) {
     try {
-      const response = await fetch('/api/authentication', {
+      const response = await fetch(`${config.api}/authentication`, {
         method: 'POST',
         headers: {'Content-Type' : 'application/json'},
         body: JSON.stringify({'type': 'cred', 'credential' : res.credential})

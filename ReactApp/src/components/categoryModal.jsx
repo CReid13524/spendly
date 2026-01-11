@@ -7,6 +7,7 @@ import { AiFillEdit } from "react-icons/ai";
 import { AiOutlineEdit } from "react-icons/ai";
 import EmojiPickerModal from './emojiPickerModal';
 import { MdDelete } from "react-icons/md";
+import { config } from '../config'
 
 function CategoryModal({open, categoryData, onClose, handleError, onUpdate}) {
     const [cardData, setCardData] = useState([])
@@ -26,7 +27,10 @@ function CategoryModal({open, categoryData, onClose, handleError, onUpdate}) {
     async function getTransactionData() {
         
         try {
-          const response = await fetch(`/api/transactions/0/${categoryData.categoryID}`, {method: 'GET'});
+          const response = await fetch(`${config.api}/transactions/0/${categoryData.categoryID}`, {
+            method: 'GET',
+            credentials: "include",
+          });
           const data = await response.json();
           if (!response.ok) {
               throw data.error
@@ -50,7 +54,10 @@ function CategoryModal({open, categoryData, onClose, handleError, onUpdate}) {
       
       async function fetchExcess(isFetching) {
         try {
-          const response = await fetch(`/api/transactions/${cardDataRef.current.length}/${categoryData.categoryID}`, {method: 'GET'});
+          const response = await fetch(`${config.api}/transactions/${cardDataRef.current.length}/${categoryData.categoryID}`, {
+            method: 'GET',
+            credentials: "include",
+          });
           const data = await response.json();
           if (!response.ok) {
               throw data.error
@@ -77,9 +84,10 @@ function CategoryModal({open, categoryData, onClose, handleError, onUpdate}) {
 
       async function handleUpdate({reqIsIncome=selectIncome,reqIsDefault=isDefault,reqIsHidden=isHidden}) {
         try {
-          const response = await fetch('/api/categories', {
+          const response = await fetch(`${config.api}/categories`, {
             method: 'PUT',
             headers:  {'Content-Type' : 'application/json'},
+            credentials: "include",
             body: JSON.stringify({"categoryID":categoryData.categoryID, 'color':selectColor, 'name':selectName, 'icon':selectIcon, 'isIncome': reqIsIncome ? 1 : 0,
               'isDefault': reqIsDefault ? 1 : 0, 'isHidden': reqIsHidden ? 1 : 0
             })
@@ -123,9 +131,10 @@ function CategoryModal({open, categoryData, onClose, handleError, onUpdate}) {
       if (window.confirm(`Are you sure? ${categoryData.name} (ID: ${categoryData.categoryID}) will be deleted forever.
 All existing transaction will be unset.`))
       try {
-        const response = await fetch('/api/categories', {
+        const response = await fetch(`${config.api}/categories`, {
           method: 'DELETE',
           headers:  {'Content-Type' : 'application/json'},
+          credentials: "include",
           body: JSON.stringify({"categoryID":categoryData.categoryID})
         });
         const data = await response.json();

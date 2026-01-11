@@ -13,7 +13,7 @@ import LoadingAnimated from './components/loadingAnimated'
 import NavigationBar from './components/navigationBar'
 import Help from './pages/help'
 import { ThemeProvider } from './components/theme-context'
-
+import { config } from './config'
 
 
 function App() {
@@ -27,7 +27,7 @@ function App() {
     // Run auth verification only if not on the login page
       const verifyAuth = async (quick=false) => {
         try {
-          const response = await fetch('/api/authentication', {
+          const response = await fetch(`${config.api}/authentication`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',

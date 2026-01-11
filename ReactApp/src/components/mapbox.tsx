@@ -10,7 +10,7 @@ import { TRANSACTION_POINT_SOURCE_ID, TRANSACTION_POINT_SOURCE_SETTINGS,
     TRANSACTION_POINT_CLUSTER_CIRCLE_LAYER_ID, TRANSACTION_POINT_DOT_LAYER_ID,
     TRANSACTION_POINT_BASE_FILTER, TRANSACTION_POINT_CLUSTER_BASE_FILTER, createNewTransactionMarker
   } from './mapboxConfig';
-import './env.d.ts'
+import '../env.d.ts'
 import { useTheme } from './theme-context.tsx'
 import dayjs from 'dayjs';
 import advancedFormat from "dayjs/plugin/advancedFormat";

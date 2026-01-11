@@ -1,7 +1,6 @@
 from flask import request, make_response
 from flask_restx import Resource
 from FlaskApp.serv.user.services import get_user_data, create_new_user, login_exisiting_user, get_user_from_token, reset_user_account, delete_user_account
-from werkzeug.exceptions import HTTPException
 
 class User(Resource):
 
@@ -16,10 +15,7 @@ class User(Resource):
         return {'data': data}, 200
 
     def post(self):
-        try:
-            data = request.get_json()
-        except HTTPException as e:
-            return {'error': str(e)}, e.code
+        data = request.get_json()
         e = create_new_user(data['email'],data['password'])
         if e:
             return  {'error': str(e)}, 500

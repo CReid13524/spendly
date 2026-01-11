@@ -8,7 +8,7 @@ class Transaction(Resource):
         token = request.cookies.get('auth_token')
         e, userid = get_user_from_token(token)
         if e:
-            return {'error': e}, 500
+            return {'error': str(e)}, 500
         if 'mass_delete' in request.path:
             e, res = get_uploads_by_id(userid)
             if e:
@@ -23,7 +23,7 @@ class Transaction(Resource):
         token = request.cookies.get('auth_token')
         e, userId = get_user_from_token(token)
         if e:
-            return {'error': e}, 500
+            return {'error': str(e)}, 500
         file = request.files['file']
         raw_data = request.form.get('data')
         if raw_data is None:
