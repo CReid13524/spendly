@@ -3,6 +3,7 @@ import Select from 'react-select'
 import { GoogleLogin } from '@react-oauth/google';
 import bcrypt from "bcryptjs-react";
 import { useNavigate } from 'react-router-dom';
+import { config } from '../config';
 
 function DeleteCSV() {
   const [userData, setUserData] = useState({})

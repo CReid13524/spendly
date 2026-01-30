@@ -1,6 +1,7 @@
 import datetime
 import jwt
 from flask import make_response
+from google.auth.transport import requests
 from flask import current_app
 from FlaskApp.serv.services import get_db, get_user_from_token, get_auth_data
 from google.oauth2 import id_token
@@ -42,7 +43,7 @@ def login_with_google(cred, request):
     # Google login conincides with User Resource as Secure resource handles login/create for google
     try:
         curr = get_db()
-        id_info = id_token.verify_oauth2_token(cred, request, current_app.config['GOOGLE_CLIENT_ID'])
+        id_info = id_token.verify_oauth2_token(cred, requests.Request(), current_app.config['GOOGLE_CLIENT_ID'])
         if id_info['aud'] != current_app.config['GOOGLE_CLIENT_ID']:
             print(id_info['aud'], current_app.config['GOOGLE_CLIENT_ID'])
             raise ValueError('Could not verify audience.')

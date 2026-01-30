@@ -12,6 +12,7 @@ function LoginWithGoogle() {
       const response = await fetch(`${config.api}/authentication`, {
         method: 'POST',
         headers: {'Content-Type' : 'application/json'},
+        credentials: 'include',
         body: JSON.stringify({'type': 'cred', 'credential' : res.credential})
       });
       const data = await response.json();
