@@ -102,7 +102,12 @@ def akahu_merchant_to_domain(
         nzbn=akahu_merchant['nzbn'] if 'nzbn' in akahu_merchant else None,
         name=akahu_merchant['name'],
         website=akahu_merchant['website'] if 'website' in akahu_merchant else None,
+<<<<<<< HEAD
         logo=tx['meta']['logo'] if 'meta' in tx and 'logo' in tx['meta'] else None
+=======
+        logo=tx['meta']['logo'] if 'meta' in tx and 'logo' in tx['meta'] else None,
+        merchant=merchant,
+>>>>>>> ee0e39a (Feat(Akahu integration): Created ORM)
     )
 
 
