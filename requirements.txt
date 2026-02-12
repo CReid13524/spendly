@@ -8,3 +8,4 @@ PyJWT
 bcrypt
 requests
 flask_cors
+sqlalchemy
