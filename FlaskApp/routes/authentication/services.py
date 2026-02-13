@@ -7,6 +7,7 @@ from flask import current_app
 from google.oauth2 import id_token
 from FlaskApp.infra.unit_of_work import AbstractUnitOfWork
 from FlaskApp.domainmodel import User, ExternalIdentity
+from FlaskApp.infra.exceptions import ValidationError
 
 def create_auth_token(user_id: uuid.UUID):
     payload = {
@@ -42,7 +43,7 @@ def login_with_google(uow: AbstractUnitOfWork, credential: str, request: Request
         #Veify token:
         id_info = id_token.verify_oauth2_token(credential, requests.Request(), current_app.config['GOOGLE_CLIENT_ID'])
         if id_info['aud'] != current_app.config['GOOGLE_CLIENT_ID']:
-            raise ValueError('Could not verify audience.')
+            raise ValidationError('Could not verify audience.')
 
         # Check if user exists, if not create new user and external identity
         is_exists = uow.users.external_id_exists('google', id_info['sub'])
@@ -82,13 +83,9 @@ def login_with_details(uow: AbstractUnitOfWork, email: str, password: str):
         # Don't want to give away which one is wrong
         if not user:
             # User doesnt exist
-            raise InvalidCredentials("Invalid email or password")
+            raise ValidationError("Invalid email or password")
         if not user.check_password(password):
             # Password is wrong
-            raise InvalidCredentials("Invalid email or password")
+            raise ValidationError("Invalid email or password")
         uow.users.active(user)
         return create_auth_token(user.id)
-
-
-class InvalidCredentials(Exception):
-    pass

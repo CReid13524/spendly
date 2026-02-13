@@ -38,14 +38,9 @@ class User(Resource):
         """
         payload = request.get_json()
         uow = SqlAlchemyUnitOfWork(SessionLocal)
-        try:
-            create_new_user(uow=uow, email=payload['email'], password=payload['password'], name=payload['name'])
-            return {"success": True}, HTTPStatus.CREATED
 
-        except ValidationError as ve:
-            return {"success": False, "message": str(ve)}, HTTPStatus.BAD_REQUEST
-        except Exception as e:
-            return  {"success":False,'message': str(e)}, HTTPStatus.INTERNAL_SERVER_ERROR
+        create_new_user(uow=uow, email=payload['email'], password=payload['password'], name=payload['name'])
+        return {"success": True}, HTTPStatus.CREATED
 
     # TODO
     # def put(self):
