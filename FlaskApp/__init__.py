@@ -67,4 +67,13 @@ def create_app():
     api.add_namespace(user_ns, path='/user')
     # TODO: Add disconnected blueprints here as needed
 
+    #
+    from FlaskApp.infra.models import register_global_models
+    register_global_models(api)
+
+    # Error handlers
+    from FlaskApp.infra.exceptions import register_error_handlers
+    register_error_handlers(app, api)
+
+
     return app, api
