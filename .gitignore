@@ -2,3 +2,4 @@ webhook.py
 ServiceLogs
 .vscode/
 *.env
+.idea
