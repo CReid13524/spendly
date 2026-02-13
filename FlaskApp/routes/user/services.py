@@ -5,7 +5,7 @@ from flask import current_app
 from google.oauth2 import id_token
 from FlaskApp.domainmodel import User
 from FlaskApp.infra.unit_of_work import AbstractUnitOfWork
-
+from FlaskApp.infra.exceptions import ValidationError
 # TODO
 # def get_user_data(userID):
 #     try:
@@ -44,9 +44,6 @@ def create_new_user(uow: AbstractUnitOfWork, email, password, name):
             last_active=None
             )
         uow.users.add(user)
-
-class ValidationError(Exception):
-    pass
 
 # TODO: Authentication enpoint has login, necessary?
 # def login_exisiting_user(userID, request):

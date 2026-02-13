@@ -1,24 +1,25 @@
 from datetime import datetime, timezone
 
 import requests
-from flask import g
 
-from FlaskApp.domainmodel import Transaction, Account, ExternalIdentity
+from FlaskApp.domainmodel import Transaction, Account, ExternalIdentity, User
 from FlaskApp.infra.unit_of_work import AbstractUnitOfWork
 from FlaskApp.routes.akahu.assemblers import akahu_transaction_to_domain, akahu_account_to_domain, \
     akahu_merchant_to_domain, akahu_category_to_domain
+from FlaskApp.infra.exceptions import ValidationError
 
 
 def connect_akahu(
         bearer_token: str,
         app_id: str,
         uow: AbstractUnitOfWork,
+        user: User
 ):
     with uow:
-        akahu_identity = g.current_user.external_identities.get("akahu")
+        akahu_identity = user.external_identities.get("akahu")
 
         if akahu_identity:
-            raise ValueError("Akahu identity already exists for user")
+            raise ValidationError("Akahu identity already exists for user")
 
         client = AkahuClient(
             bearer_token=bearer_token,
@@ -26,10 +27,7 @@ def connect_akahu(
         )
 
         # Test credentials by fetching user info
-        try:
-            data = client.get_me()
-        except Exception as e:
-            raise ValueError("Invalid Akahu credentials") from e
+        data = client.get_me()
 
         # Save the Akahu credentials as an external identity
         akahu_identity = ExternalIdentity(
@@ -45,14 +43,15 @@ def connect_akahu(
             },
             connected_at=datetime.now(tz=timezone.utc)
         )
-        uow.users.add_external_identity(akahu_identity, g.current_user.id)
+        uow.users.add_external_identity(akahu_identity, user.id)
 
 
 def sync_akahu(
         uow: AbstractUnitOfWork,
         full_sync: bool,
+        user: User
 ):
-    akahu_identity = g.current_user.external_identities.get("akahu")
+    akahu_identity = user.external_identities.get("akahu")
 
     if not akahu_identity:
         raise Exception("No Akahu identity found for user")
@@ -79,7 +78,7 @@ def sync_akahu(
             # Source exisitng account ID
             existing_account: Account | None = uow.akahu_accounts.get_connected_account_by_id(acc['_id'])
 
-            account, akahu_account = akahu_account_to_domain(acc, user=g.current_user,
+            account, akahu_account = akahu_account_to_domain(acc, user=user,
                                                              existing_account=existing_account)
             uow.accounts.add_or_update(account)
             uow.akahu_accounts.add_or_update(akahu_account)
@@ -118,7 +117,7 @@ def sync_akahu(
                 akahu_tx=tx,
                 is_pending=False,  # This endpointpoint does not consider pending transaction.
                 existing_transaction=existing_transaction,
-                user=g.current_user,
+                user=user,
                 account=account,
                 akahu_account=akahu_account,
                 category=category,
@@ -195,6 +194,6 @@ class AkahuClient:
         data = response.json()
 
         if not response.ok:
-            raise Exception(f"Error fetching user info: {data.get('message', 'Unknown error')}")
+            raise ValidationError(f"Invalid Akahu credentials ({data.get('message', 'Unknown error')})")
 
         return data.get("item")

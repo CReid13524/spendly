@@ -67,4 +67,21 @@ def create_app():
     api.add_namespace(user_ns, path='/user')
     # TODO: Add disconnected blueprints here as needed
 
+    #
+    from FlaskApp.infra.models import register_global_models
+    register_global_models(api)
+
+    # Error handlers
+    from FlaskApp.infra.exceptions import register_error_handlers
+    register_error_handlers(app, api)
+
+    # Blueprints / Namespaces
+    from FlaskApp.routes.akahu import ns as akahu_ns
+    api.add_namespace(akahu_ns, path='/akahu')
+    from FlaskApp.routes.authentication import ns as auth_ns
+    api.add_namespace(auth_ns, path='/authenticate')
+    from FlaskApp.routes.user import ns as user_ns
+    api.add_namespace(user_ns, path='/user')
+    # TODO: Add disconnected blueprints here as needed
+
     return app, api

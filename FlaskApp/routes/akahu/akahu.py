@@ -1,6 +1,6 @@
 from http import HTTPStatus
 
-from flask import request
+from flask import request, g
 from flask_restx import Resource, Namespace, fields
 
 from FlaskApp.infra.db import SessionLocal
@@ -20,10 +20,9 @@ akahu_connect_model = ns.model('AkahuConnect', {
 
 @ns.route('')
 class AkahuResource(Resource):
-    @require_auth
+    @require_auth(ns=ns)
     @ns.doc(description="Sync Akahu data with Spendly")
     @ns.response(200, 'OK')
-    @ns.response(401, 'Authentication required')
     @ns.param('full_sync', 'Whether to perform a full sync. Default is false, which only syncs latest 50 transactions.',
               "query", default="False", type="boolean")
     def get(self):
@@ -33,18 +32,14 @@ class AkahuResource(Resource):
         uow = SqlAlchemyUnitOfWork(SessionLocal)
         request_args = request.args
         full_sync = request_args.get('full_sync', 'False').lower() == 'true'
-        sync_akahu(uow=uow, full_sync=full_sync)
-        try:
 
-            return {"success": True}, HTTPStatus.OK
-        except Exception as e:
-            return {'success': False, 'message': str(e)}, HTTPStatus.INTERNAL_SERVER_ERROR
+        sync_akahu(uow=uow, full_sync=full_sync, user=g.current_user)
+        return {"success": True}, HTTPStatus.OK
 
-    @require_auth
+    @require_auth(ns=ns)
     @ns.doc(description="Connect Akahu account to Spendly")
     @ns.response(200, 'OK')
     @ns.response(400, 'Validation error')
-    @ns.response(401, 'Authentication required')
     @ns.expect(akahu_connect_model, validate=True)
     def post(self):
         """
@@ -54,14 +49,11 @@ class AkahuResource(Resource):
         bearer = payload["akahu_user_id"]
         app_id = payload["akahu_app_id"]
         uow = SqlAlchemyUnitOfWork(SessionLocal)
-        try:
-            connect_akahu(
-                bearer_token=bearer,
-                app_id=app_id,
-                uow=uow,
-            )
-            return {"success": True}, HTTPStatus.OK
-        except ValueError as ve:
-            return {'success': False, 'message': str(ve)}, HTTPStatus.BAD_REQUEST
-        except Exception as e:
-            return {'success': False, 'message': str(e)}, HTTPStatus.INTERNAL_SERVER_ERROR
+
+        connect_akahu(
+            bearer_token=bearer,
+            app_id=app_id,
+            uow=uow,
+            user=g.current_user
+        )
+        return {"success": True}, HTTPStatus.OK
