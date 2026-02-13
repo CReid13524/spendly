@@ -12,7 +12,7 @@ class Category:
                  name: str,
                  description: str,
                  colour: str,
-                 icon: str,
+                 icon: str | None,
                  category_type: str,
                  created: datetime,
 
@@ -81,7 +81,7 @@ class Category:
 
     @icon.setter
     def icon(self, value):
-        if not isinstance(value, str):
+        if not isinstance(value, str | None):
             raise TypeError
         self.__icon = value
 
@@ -105,7 +105,7 @@ class Category:
 
     @parent_category.setter
     def parent_category(self, value):
-        if not isinstance(value, Category):
+        if not isinstance(value, Category | None):
             raise TypeError
         self.__parent_category = value
 

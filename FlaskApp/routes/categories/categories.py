@@ -1,52 +1,81 @@
-# TODO: Refactor this file to work with new database structure and akahu integration.
-from flask import request
-from flask_restx import Resource
-from FlaskApp.serv.categories.services import get_user_from_token, get_basic_categories, get_advanced_categories, create_category, update_category, delete_category
+from flask import request, g
+from flask_restx import Resource, Namespace, fields
+from FlaskApp.domainmodel import user
+from FlaskApp.infra.models import register_global_models_to_namespace
+from FlaskApp.infra.db import SessionLocal
+from FlaskApp.infra.services import require_auth
+from FlaskApp.infra.unit_of_work import SqlAlchemyUnitOfWork
+from FlaskApp.routes.categories.presentation import category_domain_to_json
+from FlaskApp.routes.categories.services import  get_categories, create_category, update_category, delete_category
+from http import HTTPStatus
 
+ns = Namespace('categories', description='Operations related to categories')
+
+category_item_model = ns.model('CategoryItem', {
+    'id': fields.String(readOnly=True, description='The unique identifier of a category', example="123456789abcdefabcdefabcdefabcde"),
+    'name': fields.String(required=True, description='Category name', example="Groceries"),
+    'description': fields.String(required=True, description='Category description', example="Monthly grocery expenses"),
+    'colour': fields.String(required=True, description='Category colour in hex code', example="#FF5733"),
+    'icon': fields.String(required=True, description='Category icon name', example="🥗"),
+    'type': fields.String(required=True, description='Category type ("expense","income","all")', example="all"),
+    'parent_category_id': fields.String(description='ID of the parent category, if any', example="")
+})
+
+new_category_item_model = ns.model('NewCategoryItem', {
+    'name': fields.String(required=True, description='Category name', example="Groceries"),
+    'description': fields.String(required=True, description='Category description', example="Monthly grocery expenses"),
+    'colour': fields.String(required=True, description='Category colour in hex code', example="#FF5733"),
+    'icon': fields.String(required=True, description='Category icon name', example="🥗"),
+    'type': fields.String(required=True, description='Category type ("expense","income","all")', example="all"),
+    'parent_category_id': fields.String(description='ID of the parent category, if any', example="")
+})
+
+category_model = ns.model('Category', {
+    "success": fields.Boolean(description='Indicates if the request was successful', example=True),
+    "categories": fields.List(fields.Nested(category_item_model))
+})
+
+category_id_model = ns.model('category_id', {
+    'id': fields.String(required=True, description='The unique identifier of a category', example="123456789abcdefabcdefabcdefabcde")
+})
+@ns.route('')
 class Category(Resource):
-    def get(self,advanced=False, date=''):
-        advanced = bool(advanced)
-        token = request.cookies.get('auth_token')
-        e, userID = get_user_from_token(token)
-        if e:
-            return {'error': str(e)}, 500
-        if advanced:
-            e, res = get_advanced_categories(date, userID)
-        else:
-            e, res = get_basic_categories(userID)
-        if e:
-            return {'error': str(e)}, 500
-        return {"data":res}, 200
 
+    @ns.response(HTTPStatus.OK, 'Success', category_model)
+    @require_auth(ns=ns)
+    def get(self):
+        """Get all categories for the current user."""
+        uow = SqlAlchemyUnitOfWork(SessionLocal)
+        categories = get_categories(uow=uow, user=g.current_user)
+        categories_json = [category_domain_to_json(category) for category in categories]
+        return {"success": True, "categories": categories_json}, HTTPStatus.OK
+
+    @ns.response(HTTPStatus.CREATED, 'Success')
+    @ns.expect(new_category_item_model, validate=True)
+    @require_auth(ns=ns)
     def post(self):
-        token = request.cookies.get('auth_token')
-        e, userID = get_user_from_token(token)
-        if e:
-            return {'error': str(e)}, 500
+        """Create a new category."""
+        uow = SqlAlchemyUnitOfWork(SessionLocal)
         data = request.get_json()
-        e = create_category(userID,data['name'],data['color'],data['icon'])
-        if e:
-            return {'error': str(e)}, 500
-        return {}, 200
+        create_category(uow=uow, user=g.current_user, **data)
+        return {"success": True}, HTTPStatus.CREATED
 
+    @ns.response(HTTPStatus.OK, 'Success')
+    @ns.expect(category_item_model, validate=True)
+    @require_auth(ns=ns)
     def put(self):
-        token = request.cookies.get('auth_token')
-        e, _ = get_user_from_token(token)
-        if e:
-            return {'error': str(e)}, 500
+        """Update an existing category."""
+        uow = SqlAlchemyUnitOfWork(SessionLocal)
         data = request.get_json()
-        e = update_category(data['name'],data['color'],data['icon'],data['isIncome'],data['isHidden'],data['isDefault'], data['categoryID'])
-        if e:
-            return {'error': str(e)}, 500
-        return {}, 200
+        update_category(uow=uow, user=g.current_user, **data)
+        return {"success": True}, HTTPStatus.OK
 
+    @ns.response(HTTPStatus.OK, 'Success')
+    @ns.expect(category_id_model, validate=True)
+    @require_auth(ns=ns)
     def delete(self):
-        token = request.cookies.get('auth_token')
-        e, _ = get_user_from_token(token)
-        if e:
-            return {'error': str(e)}, 500
+        """Delete an existing category."""
+        uow = SqlAlchemyUnitOfWork(SessionLocal)
         data = request.get_json()
-        e = delete_category(data['categoryID'])
-        if e:
-            return {'error': str(e)}, 500
-        return {}, 200
+        delete_category(uow=uow, category_id=data['id'])
+        return {"success": True}, HTTPStatus.OK

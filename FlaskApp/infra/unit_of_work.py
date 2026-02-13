@@ -3,7 +3,8 @@ from abc import ABC, abstractmethod
 from sqlalchemy.orm import Session
 
 from FlaskApp.infra.repositories import AccountRepository, TransactionRepository, MerchantRepository, \
-    AkahuAccountRepository, AkahuTransactionRepository, AkahuMerchantRepository, AkahuCategoryRepository, UserRepository
+    AkahuAccountRepository, AkahuTransactionRepository, AkahuMerchantRepository, AkahuCategoryRepository, UserRepository, \
+    CategoryRepository
 
 
 class AbstractUnitOfWork(ABC):
@@ -15,6 +16,7 @@ class AbstractUnitOfWork(ABC):
     akahu_transactions: AkahuTransactionRepository
     akahu_merchants: AkahuMerchantRepository
     akahu_categories: AkahuCategoryRepository
+    categories: CategoryRepository
 
     def __enter__(self):
         return self
@@ -48,6 +50,7 @@ class SqlAlchemyUnitOfWork(AbstractUnitOfWork):
         self.akahu_transactions = AkahuTransactionRepository(self.session)
         self.akahu_merchants = AkahuMerchantRepository(self.session)
         self.akahu_categories = AkahuCategoryRepository(self.session)
+        self.categories = CategoryRepository(self.session)
 
         return self
 
