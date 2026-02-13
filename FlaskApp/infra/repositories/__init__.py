@@ -6,3 +6,4 @@ from FlaskApp.infra.repositories.akahu_transaction import AkahuTransactionReposi
 from FlaskApp.infra.repositories.merchant import MerchantRepository
 from FlaskApp.infra.repositories.transaction import TransactionRepository
 from FlaskApp.infra.repositories.user import UserRepository
+from FlaskApp.infra.repositories.category import CategoryRepository

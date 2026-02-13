@@ -65,6 +65,8 @@ def create_app():
     api.add_namespace(auth_ns, path='/authenticate')
     from FlaskApp.routes.user import ns as user_ns
     api.add_namespace(user_ns, path='/user')
+    from FlaskApp.routes.categories import ns as categories_ns
+    api.add_namespace(categories_ns, path='/category')
     # TODO: Add disconnected blueprints here as needed
 
     #

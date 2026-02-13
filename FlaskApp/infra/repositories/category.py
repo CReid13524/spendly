@@ -1,3 +1,4 @@
+from uuid import UUID
 from sqlalchemy.orm import Session
 
 from FlaskApp.domainmodel import Category
@@ -12,14 +13,42 @@ class CategoryRepository:
 
     def add(self, category: Category):
         orm = category_domain_to_orm(category)
+        print(f"Adding category to database: {orm}")
         self.session.add(orm)
 
-    def get(self, category_id: int) -> Category | None:
+    def get(self, category_id: str | UUID, user: User) -> Category | None:
+        if isinstance(category_id, str):
+            category_id = UUID(category_id)
         orm = self.session.query(CategoryORM).filter_by(id=category_id).first()
         if orm is None:
             return None
-        return category_orm_to_domain(orm)
+        return category_orm_to_domain(orm, user=user)
 
     def get_by_user(self, user: User) -> list[Category]:
         orms = self.session.query(CategoryORM).filter_by(user_id=user.id).all()
-        return [category_orm_to_domain(orm) for orm in orms]
+        return [category_orm_to_domain(orm, user=user) for orm in orms]
+
+    def update(self, category: Category):
+        orm = self.session.query(CategoryORM).filter_by(id=category.id).first()
+        if orm is None:
+            raise Exception("Category not found")
+        orm.name = category.name
+        orm.description = category.description
+        orm.colour = category.colour
+        orm.icon = category.icon
+        orm.type = category.type
+        orm.parent_category_id = category.parent_category.id if category.parent_category else None
+        self.session.add(orm)
+
+    def exists(self, category_id: str | UUID) -> bool:
+        if isinstance(category_id, str):
+            category_id = UUID(category_id)
+        return self.session.query(CategoryORM).filter_by(id=category_id).first() is not None
+
+    def delete(self, category_id: str | UUID):
+        if isinstance(category_id, str):
+            category_id = UUID(category_id)
+        orm = self.session.query(CategoryORM).filter_by(id=category_id).first()
+        if orm is None:
+            raise Exception("Category not found")
+        self.session.delete(orm)
