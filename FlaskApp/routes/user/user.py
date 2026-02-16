@@ -1,18 +1,25 @@
-from dataclasses import fields
-from flask import request, make_response
-from flask_restx import Resource, Namespace, fields
-from FlaskApp.infra.db import SessionLocal
-from FlaskApp.infra.unit_of_work import SqlAlchemyUnitOfWork
-from FlaskApp.routes.user.services import create_new_user, ValidationError
 from http import HTTPStatus
+
+from flask import request
+from flask_restx import Resource, Namespace, fields
+
+from FlaskApp.infra.db import SessionLocal
+from FlaskApp.infra.services import CREATED_RESPONSE, models
+from FlaskApp.infra.unit_of_work import SqlAlchemyUnitOfWork
+from FlaskApp.routes.user.services import create_new_user
 
 ns = Namespace("user", description="User management endpoints")
 
+# region Models
 new_user_model = ns.model('NewUser', {
     'email': fields.String(required=True, description='User email', example='me@example.com'),
     'password': fields.String(required=True, description='User password', example='example'),
     'name': fields.String(required=True, description='User name', example='John Doe'),
 })
+
+
+# endregion
+
 
 @ns.route('')
 class User(Resource):
@@ -30,8 +37,8 @@ class User(Resource):
 
     @ns.expect(new_user_model, validate=True)
     @ns.doc(description="Create a new user with email and password")
-    @ns.response(201, 'User created successfully')
-    @ns.response(400, 'Validation error')
+    @ns.response(HTTPStatus.CREATED, 'User created successfully', models['OK'])
+    @ns.response(HTTPStatus.BAD_REQUEST, 'Validation error', models['BadRequest'])
     def post(self):
         """
         Create a new user with email and password
@@ -40,7 +47,7 @@ class User(Resource):
         uow = SqlAlchemyUnitOfWork(SessionLocal)
 
         create_new_user(uow=uow, email=payload['email'], password=payload['password'], name=payload['name'])
-        return {"success": True}, HTTPStatus.CREATED
+        return CREATED_RESPONSE
 
     # TODO
     # def put(self):

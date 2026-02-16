@@ -1,21 +1,23 @@
-from http import HTTPStatus
-import sqlite3
 from functools import wraps
+from http import HTTPStatus
 
-from flask import g, abort, make_response
+from flask import g
 from flask_restx import Namespace
-from FlaskApp.infra.models import register_global_models_to_namespace
+
 from FlaskApp.infra.exceptions import Unauthorized
+from FlaskApp.infra.models import register_global_models_to_namespace
 
 app_ns = Namespace('__App__', description='Internal namespace for application-wide models and services')
 models = register_global_models_to_namespace(app_ns)
 
+OK_RESPONSE = {"success": True}, HTTPStatus.OK
+CREATED_RESPONSE = {"success": True}, HTTPStatus.CREATED
 
-# TODO: Remove get_db
-def get_db():
-    database = r'FlaskApp/spendly.db'
-    db = sqlite3.connect(database)
-    return db.cursor()
+
+def make_ok_response(**kwargs):
+    response = {"success": True}
+    response.update(kwargs)
+    return response, HTTPStatus.OK
 
 
 def require_auth(fn=None, ns=None):
@@ -24,7 +26,6 @@ def require_auth(fn=None, ns=None):
         @wraps(inner_fn)
         def wrapper(*args, **kwargs):
             if g.current_user is None:
-                from flask import jsonify
                 raise Unauthorized()
             return inner_fn(*args, **kwargs)
         # Attach Swagger response if namespace provided

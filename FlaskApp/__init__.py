@@ -57,6 +57,10 @@ def create_app():
             except jwt.InvalidTokenError:
                 # Invalid token, ignore and treat as unauthenticated
                 pass
+            except Exception as e:
+                # Log unexpected errors during user loading
+                # Can occur when valid token exists but user is not found in DB, or DB connection issues, etc.
+                print(f"Error loading user from token: {e}")
 
     # Blueprints / Namespaces
     from FlaskApp.routes.akahu import ns as akahu_ns

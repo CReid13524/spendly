@@ -13,6 +13,10 @@ class AccountRepository:
         orm = account_domain_to_orm(account)
         self._session.add(orm)
 
+        for attribute in [AccountAttributeORM(account_id=account.id, attribute=attr) for attr in
+                          account.attributes]:
+            self._session.add(attribute)
+
     def get(self, account_id: int) -> Account | None:
         orm = self._session.query(AccountORM).filter_by(id=account_id).first()
         if orm is None:
