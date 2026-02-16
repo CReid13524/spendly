@@ -7,4 +7,5 @@ from FlaskApp.domainmodel.category import Category
 from FlaskApp.domainmodel.external_identity import ExternalIdentity
 from FlaskApp.domainmodel.merchant import Merchant
 from FlaskApp.domainmodel.transaction import Transaction
+from FlaskApp.domainmodel.upload import Upload
 from FlaskApp.domainmodel.user import User

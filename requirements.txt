@@ -9,3 +9,4 @@ bcrypt
 requests
 flask_cors
 sqlalchemy
+werkzeug

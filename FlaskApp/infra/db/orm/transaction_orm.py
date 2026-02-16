@@ -14,6 +14,8 @@ class TransactionORM(Base):
     date = Column(DateTime, nullable=False)
     description = Column(String, nullable=False)
     balance = Column(Numeric, nullable=True)  # Not available via different import methods
+    type = Column(String, nullable=True)  # Not available via different import methods
+    status = Column(String, nullable=False, default='active')  # active, deleted
     pending = Column(Boolean, nullable=False)
     created = Column(DateTime, nullable=False)
     latitude = Column(Float, nullable=True)

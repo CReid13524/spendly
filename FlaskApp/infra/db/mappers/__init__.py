@@ -7,4 +7,5 @@ from FlaskApp.infra.db.mappers.external_identity_mapper import external_identity
     external_identity_domain_to_orm
 from FlaskApp.infra.db.mappers.merchant_mapper import merchant_orm_to_domain, merchant_domain_to_orm
 from FlaskApp.infra.db.mappers.transaction_mapper import transaction_orm_to_domain, transaction_domain_to_orm
+from FlaskApp.infra.db.mappers.upload_mapper import upload_orm_to_domain, upload_domain_to_orm
 from FlaskApp.infra.db.mappers.user_mapper import user_orm_to_domain, user_domain_to_orm

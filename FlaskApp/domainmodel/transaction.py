@@ -13,8 +13,10 @@ class Transaction:
             transaction_id: UUID,
             amount: Decimal,
             date: datetime,
-            description: str | None,
-            balance: Decimal,
+            description: str,
+            balance: Decimal | None,
+            transaction_type: str,
+            status: str,
             pending: bool,
             created: datetime,
             latitude: float | None,
@@ -30,6 +32,8 @@ class Transaction:
         self.__date = date
         self.__description = description
         self.__balance = balance
+        self.__type = transaction_type
+        self.__status = status
         self.__pending = pending
         self.__created = created
         self.__latitude = latitude
@@ -59,6 +63,12 @@ class Transaction:
     def amount(self):
         return self.__amount
 
+    @amount.setter
+    def amount(self, value):
+        if not isinstance(value, Decimal):
+            raise TypeError
+        self.__amount = value
+
     @property
     def date(self):
         return self.__date
@@ -83,9 +93,41 @@ class Transaction:
     def balance(self):
         return self.__balance
 
+    @balance.setter
+    def balance(self, value):
+        if value is not None and not isinstance(value, Decimal):
+            raise TypeError
+        self.__balance = value
+
+    @property
+    def type(self):
+        return self.__type
+
+    @type.setter
+    def type(self, value):
+        if not isinstance(value, str):
+            raise TypeError
+        self.__type = value
+
+    @property
+    def status(self):
+        return self.__status
+
+    @status.setter
+    def status(self, value):
+        if not isinstance(value, str):
+            raise TypeError
+        self.__status = value
+
     @property
     def pending(self):
         return self.__pending
+
+    @pending.setter
+    def pending(self, value):
+        if not isinstance(value, bool):
+            raise TypeError
+        self.__pending = value
 
     @property
     def created(self):
@@ -97,7 +139,7 @@ class Transaction:
 
     @latitude.setter
     def latitude(self, value):
-        if not isinstance(value, float):
+        if value is not None and not isinstance(value, float):
             raise TypeError
         self.__latitude = value
 
@@ -107,7 +149,7 @@ class Transaction:
 
     @longitude.setter
     def longitude(self, value):
-        if not isinstance(value, float):
+        if value is not None and not isinstance(value, float):
             raise TypeError
         self.__longitude = value
 
@@ -119,16 +161,28 @@ class Transaction:
     def account(self):
         return self.__account
 
+    @account.setter
+    def account(self, value: 'Account'):
+        if not isinstance(value, Account):
+            raise TypeError
+        self.__account = value
+
     @property
     def category(self):
         return self.__category
 
     @category.setter
-    def category(self, value: 'Category'):
-        if not isinstance(value, Category):
+    def category(self, value: 'Category | None'):
+        if value is not None and not isinstance(value, Category):
             raise TypeError
         self.__category = value
 
     @property
     def merchant(self):
         return self.__merchant
+
+    @merchant.setter
+    def merchant(self, value: 'Merchant | None'):
+        if value is not None and not isinstance(value, Merchant):
+            raise TypeError
+        self.__merchant = value
