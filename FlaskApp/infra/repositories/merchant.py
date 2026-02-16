@@ -1,8 +1,9 @@
+from uuid import UUID
+
 from sqlalchemy.orm import Session
 
-from FlaskApp.domainmodel import Merchant
-from FlaskApp.infra.db.mappers import merchant_orm_to_domain, merchant_domain_to_orm
-from FlaskApp.infra.db.mappers.user_mapper import user_orm_to_domain
+from FlaskApp.domainmodel import Merchant, User
+from FlaskApp.infra.db.mappers import merchant_orm_to_domain, merchant_domain_to_orm, user_orm_to_domain
 from FlaskApp.infra.db.orm import MerchantORM
 
 
@@ -14,8 +15,10 @@ class MerchantRepository:
         orm = merchant_domain_to_orm(merchant)
         self.session.add(orm)
 
-    def get(self, merchant_id: int) -> Merchant | None:
-        orm = self.session.query(MerchantORM).filter_by(id=merchant_id).first()
+    def get(self, merchant_id: str | UUID, user: User) -> Merchant | None:
+        if isinstance(merchant_id, str):
+            merchant_id = UUID(merchant_id)
+        orm = self.session.query(MerchantORM).filter_by(id=merchant_id, user_id=user.id).first()
         if orm is None:
             return None
         user = user_orm_to_domain(orm.user)

@@ -47,10 +47,11 @@ def update_category(uow: AbstractUnitOfWork, user: User, id: str, name: str, des
         category.icon = icon
         category.type = type
         category.parent_category = parent_category
-        uow.categories.update(category)
+        uow.categories.update(category, user=user)
 
-def delete_category(uow: AbstractUnitOfWork, category_id: str):
+
+def delete_category(uow: AbstractUnitOfWork, user: User, category_id: str):
     with uow:
-        if not uow.categories.exists(category_id):
+        if not uow.categories.exists(category_id, user=user):
             raise Exception("Category not found")
-        uow.categories.delete(category_id)
+        uow.categories.delete(category_id, user=user)

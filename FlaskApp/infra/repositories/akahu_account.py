@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 
 from sqlalchemy.orm import Session
 
-from FlaskApp.domainmodel import AkahuAccount, Account
+from FlaskApp.domainmodel import AkahuAccount, Account, User
 from FlaskApp.infra.db.mappers import akahu_account_orm_to_domain, account_orm_to_domain, akahu_account_domain_to_orm, \
     user_orm_to_domain
 from FlaskApp.infra.db.orm import AkahuAccountORM
@@ -19,22 +19,22 @@ class AkahuAccountRepository:
     def exists(self, akahu_account_id: str) -> bool:
         return self._session.query(AkahuAccountORM).filter_by(id=akahu_account_id).first() is not None
 
-    def get(self, akahu_account_id: str) -> AkahuAccount | None:
-        orm = self._session.query(AkahuAccountORM).filter_by(id=akahu_account_id).first()
+    def get(self, akahu_account_id: str, user: User) -> AkahuAccount | None:
+        orm = self._session.query(AkahuAccountORM).filter_by(id=akahu_account_id, user_id=user.id).first()
         if orm is None:
             return None
         user = user_orm_to_domain(orm.user)
         return akahu_account_orm_to_domain(orm, user=user)
 
-    def get_connected_account_by_id(self, akahu_account_id: str) -> Account | None:
-        orm = self._session.query(AkahuAccountORM).filter_by(id=akahu_account_id).first()
+    def get_connected_account_by_id(self, akahu_account_id: str, user: User) -> Account | None:
+        orm = self._session.query(AkahuAccountORM).filter_by(id=akahu_account_id, user_id=user.id).first()
         if orm is None:
             return None
         user = user_orm_to_domain(orm.user)
         return account_orm_to_domain(orm.account, user=user)
 
-    def add_or_update(self, akahu_account: AkahuAccount):
-        existing = self._session.query(AkahuAccountORM).filter_by(id=akahu_account.id).first()
+    def add_or_update(self, akahu_account: AkahuAccount, user: User):
+        existing = self._session.query(AkahuAccountORM).filter_by(id=akahu_account.id, user_id=user.id).first()
         if existing:
             # Update existing fields
             existing.authorisation = akahu_account.authorisation
@@ -48,7 +48,7 @@ class AkahuAccountRepository:
             orm = akahu_account_domain_to_orm(akahu_account)
             self._session.add(orm)
 
-    def log_refresh_attempt(self, akahu_account_id: str):
-        existing = self._session.query(AkahuAccountORM).filter_by(id=akahu_account_id).first()
+    def log_refresh_attempt(self, akahu_account_id: str, user: User):
+        existing = self._session.query(AkahuAccountORM).filter_by(id=akahu_account_id, user_id=user.id).first()
         if existing:
             existing.refresh_attempt = datetime.now(tz=timezone.utc)

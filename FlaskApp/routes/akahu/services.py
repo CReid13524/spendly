@@ -73,19 +73,19 @@ def sync_akahu(
     with uow:
         # Accounts
         for acc in akahu_accounts:
-            uow.akahu_accounts.log_refresh_attempt(acc['_id'])  # Not included in update function
+            uow.akahu_accounts.log_refresh_attempt(acc['_id'], user=user)  # Not included in update function
 
             # Source exisitng account ID
-            existing_account: Account | None = uow.akahu_accounts.get_connected_account_by_id(acc['_id'])
+            existing_account: Account | None = uow.akahu_accounts.get_connected_account_by_id(acc['_id'], user=user)
 
             account, akahu_account = akahu_account_to_domain(acc, user=user,
                                                              existing_account=existing_account)
-            uow.accounts.add_or_update(account)
-            uow.akahu_accounts.add_or_update(akahu_account)
+            uow.accounts.add_or_update(account, user=user)
+            uow.akahu_accounts.add_or_update(akahu_account, user=user)
 
         # Transactions
         for tx in akahu_transactions:
-            akahu_account = uow.akahu_accounts.get(tx['_account'])
+            akahu_account = uow.akahu_accounts.get(tx['_account'], user=user)
             if not akahu_account:
                 raise Exception(f"Akahu Account not found")
             account = akahu_account.account
@@ -110,7 +110,8 @@ def sync_akahu(
             category = None
 
             # Source existing transaction by Akahu transaction ID
-            existing_transaction: Transaction | None = uow.akahu_transactions.get_connected_transaction_by_id(tx['_id'])
+            existing_transaction: Transaction | None = uow.akahu_transactions.get_connected_transaction_by_id(tx['_id'],
+                                                                                                              user=user)
 
             # Transaction
             transaction, akahu_transaction = akahu_transaction_to_domain(
@@ -126,8 +127,8 @@ def sync_akahu(
                 akahu_merchant=akahu_merchant,
             )
 
-            uow.transactions.add_or_update(transaction)
-            uow.akahu_transactions.add_or_update(akahu_transaction)
+            uow.transactions.add_or_update(transaction, user=user)
+            uow.akahu_transactions.add_or_update(akahu_transaction, user=user)
 
 
 class AkahuClient:
@@ -181,7 +182,6 @@ class AkahuClient:
             if not full_sync or len(new_transactions) == 0 or cursor is None:
                 # If not full sync, only fetch the first page (latest 50 transactions)
                 break
-            print(f"Fetched {len(transactions)} transactions so far... Next cursor: {cursor}")
         return transactions
 
     def get_me(self):
