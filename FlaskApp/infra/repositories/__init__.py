@@ -3,7 +3,8 @@ from FlaskApp.infra.repositories.akahu_account import AkahuAccountRepository
 from FlaskApp.infra.repositories.akahu_category import AkahuCategoryRepository
 from FlaskApp.infra.repositories.akahu_merchant import AkahuMerchantRepository
 from FlaskApp.infra.repositories.akahu_transaction import AkahuTransactionRepository
+from FlaskApp.infra.repositories.category import CategoryRepository
 from FlaskApp.infra.repositories.merchant import MerchantRepository
 from FlaskApp.infra.repositories.transaction import TransactionRepository
+from FlaskApp.infra.repositories.upload import UploadRepository
 from FlaskApp.infra.repositories.user import UserRepository
-from FlaskApp.infra.repositories.category import CategoryRepository

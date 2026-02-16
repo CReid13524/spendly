@@ -25,6 +25,8 @@ def akahu_transaction_to_domain(
         date=datetime.fromisoformat(akahu_tx['date']),
         description=akahu_tx['description'],
         balance=akahu_tx['balance'],
+        transaction_type=akahu_tx['type'],
+        status='active',
         pending=is_pending,
         created=datetime.fromisoformat(akahu_tx['created_at']),
         latitude=None,

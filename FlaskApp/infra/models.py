@@ -1,4 +1,3 @@
-from http import HTTPStatus
 from flask_restx import fields, Namespace, Api
 
 models = {
@@ -9,6 +8,13 @@ models = {
     'InternalServerError': {
         'success': fields.Boolean(description='Indicates if the request was successful', example=False),
         'message': fields.String(description='Error message for internal server errors', example="Internal Server Error")
+    },
+    'BadRequest': {
+        'success': fields.Boolean(description='Indicates if the request was successful', example=False),
+        'message': fields.String(description='Error message for bad requests', example="Bad Request")
+    },
+    'OK': {
+        'success': fields.Boolean(description='Indicates if the request was successful', example=True)
     }
 }
 
@@ -26,3 +32,37 @@ def register_global_models(api: Api):
             api.models[model_name] = api.model(model_name, model_fields)
 
 
+# Custom boolean parser for query params
+def parse_bool(val):
+    if isinstance(val, bool):
+        return val
+    if val is None:
+        return None
+    val = str(val).strip().lower()
+    if val in ('true', '1', 'yes', 'y', 'on'):
+        return True
+    if val in ('false', '0', 'no', 'n', 'off'):
+        return False
+    raise ValueError(f"Invalid boolean value: {val}")
+
+
+# Parser for fields that allow boolean (existence) or string/UUID (exact match)
+def parse_bool_or_other(val, type):
+    if val is None:
+        return None
+    # Try boolean first
+    try:
+        return parse_bool(val)
+    except Exception:
+        pass
+    return type(val)
+
+
+class NullableString(fields.String):
+    __schema_type__ = ['string', 'null']
+    __schema_example__ = 'nullable string'
+
+
+class NullableFloat(fields.Float):
+    __schema_type__ = ['number', 'null']
+    __schema_example__ = 'nullable number'

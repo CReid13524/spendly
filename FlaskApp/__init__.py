@@ -57,6 +57,10 @@ def create_app():
             except jwt.InvalidTokenError:
                 # Invalid token, ignore and treat as unauthenticated
                 pass
+            except Exception as e:
+                # Log unexpected errors during user loading
+                # Can occur when valid token exists but user is not found in DB, or DB connection issues, etc.
+                print(f"Error loading user from token: {e}")
 
     # Blueprints / Namespaces
     from FlaskApp.routes.akahu import ns as akahu_ns
@@ -67,6 +71,8 @@ def create_app():
     api.add_namespace(user_ns, path='/user')
     from FlaskApp.routes.categories import ns as categories_ns
     api.add_namespace(categories_ns, path='/category')
+    from FlaskApp.routes.transactions import ns as transactions_ns
+    api.add_namespace(transactions_ns, path='/transaction')
     # TODO: Add disconnected blueprints here as needed
 
     #

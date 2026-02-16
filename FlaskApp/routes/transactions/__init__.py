@@ -1,1 +1,1 @@
-from .transactions import Transaction
+from FlaskApp.routes.transactions.transactions import ns

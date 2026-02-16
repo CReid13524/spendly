@@ -1,7 +1,9 @@
+from uuid import UUID
+
 from sqlalchemy.orm import Session
 
-from FlaskApp.domainmodel import Account
-from FlaskApp.infra.db.mappers import account_orm_to_domain, account_domain_to_orm, user_orm_to_domain
+from FlaskApp.domainmodel import Account, User
+from FlaskApp.infra.db.mappers import account_orm_to_domain, account_domain_to_orm
 from FlaskApp.infra.db.orm import AccountAttributeORM, AccountORM
 
 
@@ -13,18 +15,25 @@ class AccountRepository:
         orm = account_domain_to_orm(account)
         self._session.add(orm)
 
-    def get(self, account_id: int) -> Account | None:
-        orm = self._session.query(AccountORM).filter_by(id=account_id).first()
+        for attribute in [AccountAttributeORM(account_id=account.id, attribute=attr) for attr in
+                          account.attributes]:
+            self._session.add(attribute)
+
+    def get(self, account_id: str | UUID, user: User) -> Account | None:
+        if isinstance(account_id, str):
+            account_id = UUID(account_id)
+        orm = self._session.query(AccountORM).filter_by(id=account_id, user_id=user.id).first()
         if orm is None:
             return None
-        user = user_orm_to_domain(orm.user)
         return account_orm_to_domain(orm, user=user)
 
-    def exists(self, account_id: int) -> bool:
-        return self._session.query(AccountORM).filter_by(id=account_id).first() is not None
+    def exists(self, account_id: str | UUID, user: User) -> bool:
+        if isinstance(account_id, str):
+            account_id = UUID(account_id)
+        return self._session.query(AccountORM).filter_by(id=account_id, user_id=user.id).first() is not None
 
-    def add_or_update(self, account: Account):
-        existing = self._session.query(AccountORM).filter_by(id=account.id).first()
+    def add_or_update(self, account: Account, user: User):
+        existing = self._session.query(AccountORM).filter_by(id=account.id, user_id=user.id).first()
         if existing:
             # Update existing fields
             existing.name = account.name
@@ -35,7 +44,6 @@ class AccountRepository:
             existing.credit_limit = account.credit_limit
             existing.overdrawn = account.overdrawn
             existing.status = account.status
-
             # Sync attributes
             existing_attrs = {a.attribute: a for a in
                               self._session.query(AccountAttributeORM).filter_by(account_id=account.id).all()}
