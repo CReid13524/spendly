@@ -39,9 +39,9 @@ def parse_bool(val):
     if val is None:
         return None
     val = str(val).strip().lower()
-    if val in ('true', '1', 'yes', 'y', 'on'):
+    if val in ('true'):
         return True
-    if val in ('false', '0', 'no', 'n', 'off'):
+    if val in ('false'):
         return False
     raise ValueError(f"Invalid boolean value: {val}")
 

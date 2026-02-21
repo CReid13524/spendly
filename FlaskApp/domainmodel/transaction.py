@@ -1,21 +1,41 @@
 from datetime import datetime
-from decimal import Decimal
+import enum
 from typing import TYPE_CHECKING
 from uuid import UUID
+from FlaskApp.domainmodel.base import ValidatingBaseModel
 
 if TYPE_CHECKING:
     from FlaskApp.domainmodel import Category, Account, User, Merchant
 
+# ... (enum definitions remain same)
 
-class Transaction:
+
+class TransactionType(enum.Enum):
+    CREDIT = 'credit'
+    DEBIT = 'debit'
+    PAYMENT = 'payment'
+    TRANSFER = 'transfer'
+    STANDING_ORDER = 'standing order'
+    EFTPOS = 'eftpos'
+    INTEREST = 'interest'
+    FEE = 'fee'
+    TAX = 'tax'
+    CREDIT_CARD = 'credit card'
+    DIRECT_CREDIT = 'direct credit'
+    DIRECT_DEBIT = 'direct debit'
+    ATM = 'atm'
+    LOAN = 'loan'
+
+
+class Transaction(ValidatingBaseModel):
     def __init__(
             self,
             transaction_id: UUID,
-            amount: Decimal,
+            amount: int,
             date: datetime,
             description: str,
-            balance: Decimal | None,
-            transaction_type: str,
+            balance: int | None,
+            transaction_type: TransactionType,
             status: str,
             pending: bool,
             created: datetime,
@@ -27,22 +47,25 @@ class Transaction:
             category: 'Category | None',
             merchant: 'Merchant | None',
     ):
-        self.__id = transaction_id
-        self.__amount = amount
-        self.__date = date
-        self.__description = description
-        self.__balance = balance
-        self.__type = transaction_type
-        self.__status = status
-        self.__pending = pending
-        self.__created = created
-        self.__latitude = latitude
-        self.__longitude = longitude
+        # Validate and assign immutable fields
+        self.__id = self._validate_uuid(transaction_id, "transaction_id")
+        self.__created = self._validate_datetime(created, "created")
+        self.__user = self._validate_not_none(user, "user")
 
-        self.__user = user
-        self.__account = account
-        self.__category = category
-        self.__merchant = merchant
+        # Assign mutable fields via setters
+        self.amount = amount
+        self.date = date
+        self.description = description
+        self.balance = balance
+        self.type = transaction_type
+        self.status = status
+        self.pending = pending
+        self.latitude = latitude
+        self.longitude = longitude
+
+        self.account = account
+        self.category = category
+        self.merchant = merchant
 
     def __repr__(self):
         return f"<Transaction {self.id}: {self.description}>"
@@ -65,9 +88,7 @@ class Transaction:
 
     @amount.setter
     def amount(self, value):
-        if not isinstance(value, Decimal):
-            raise TypeError
-        self.__amount = value
+        self.__amount = self._validate_type(value, int, "amount")
 
     @property
     def date(self):
@@ -75,9 +96,7 @@ class Transaction:
 
     @date.setter
     def date(self, value):
-        if not isinstance(value, datetime):
-            raise TypeError
-        self.__date = value
+        self.__date = self._validate_datetime(value, "date")
 
     @property
     def description(self):
@@ -85,9 +104,7 @@ class Transaction:
 
     @description.setter
     def description(self, value):
-        if not isinstance(value, str):
-            raise TypeError
-        self.__description = value
+        self.__description = self._validate_string_not_empty(value, "description")
 
     @property
     def balance(self):
@@ -95,9 +112,7 @@ class Transaction:
 
     @balance.setter
     def balance(self, value):
-        if value is not None and not isinstance(value, Decimal):
-            raise TypeError
-        self.__balance = value
+        self.__balance = self._validate_type(value, int, "balance", allow_none=True)
 
     @property
     def type(self):
@@ -105,8 +120,16 @@ class Transaction:
 
     @type.setter
     def type(self, value):
-        if not isinstance(value, str):
-            raise TypeError
+        if isinstance(value, str):
+            try:
+                test_value = TransactionType(value)
+                self._validate_type(test_value, TransactionType, "type")
+            except ValueError:
+                raise ValueError(f"Invalid TransactionType: {value}")
+        elif isinstance(value, TransactionType):
+            self._validate_type(value, TransactionType, "type")
+        else:
+            raise TypeError(f"Invalid type for TransactionType: {type(value).__name__}")
         self.__type = value
 
     @property
@@ -115,9 +138,7 @@ class Transaction:
 
     @status.setter
     def status(self, value):
-        if not isinstance(value, str):
-            raise TypeError
-        self.__status = value
+        self.__status = self._validate_string_not_empty(value, "status")
 
     @property
     def pending(self):
@@ -125,9 +146,7 @@ class Transaction:
 
     @pending.setter
     def pending(self, value):
-        if not isinstance(value, bool):
-            raise TypeError
-        self.__pending = value
+        self.__pending = self._validate_boolean(value, "pending")
 
     @property
     def created(self):
@@ -139,9 +158,7 @@ class Transaction:
 
     @latitude.setter
     def latitude(self, value):
-        if value is not None and not isinstance(value, float):
-            raise TypeError
-        self.__latitude = value
+        self.__latitude = self._validate_float(value, "latitude", allow_none=True)
 
     @property
     def longitude(self):
@@ -149,9 +166,7 @@ class Transaction:
 
     @longitude.setter
     def longitude(self, value):
-        if value is not None and not isinstance(value, float):
-            raise TypeError
-        self.__longitude = value
+        self.__longitude = self._validate_float(value, "longitude", allow_none=True)
 
     @property
     def user(self):
@@ -163,8 +178,10 @@ class Transaction:
 
     @account.setter
     def account(self, value: 'Account'):
+        # Specific check for domain object
+        from FlaskApp.domainmodel.account import Account
         if not isinstance(value, Account):
-            raise TypeError
+            raise TypeError(f"account must be an Account object, got {type(value).__name__}")
         self.__account = value
 
     @property
@@ -173,8 +190,10 @@ class Transaction:
 
     @category.setter
     def category(self, value: 'Category | None'):
+        # Specific check for domain object
+        from FlaskApp.domainmodel.category import Category
         if value is not None and not isinstance(value, Category):
-            raise TypeError
+            raise TypeError(f"category must be a Category object, got {type(value).__name__}")
         self.__category = value
 
     @property
@@ -183,6 +202,8 @@ class Transaction:
 
     @merchant.setter
     def merchant(self, value: 'Merchant | None'):
+        # Specific check for domain object
+        from FlaskApp.domainmodel.merchant import Merchant
         if value is not None and not isinstance(value, Merchant):
-            raise TypeError
+            raise TypeError(f"merchant must be a Merchant object, got {type(value).__name__}")
         self.__merchant = value

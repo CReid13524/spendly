@@ -1,7 +1,8 @@
 from datetime import datetime
+from FlaskApp.domainmodel.base import ValidatingBaseModel
 
 
-class ExternalIdentity:
+class ExternalIdentity(ValidatingBaseModel):
     def __init__(
             self,
             provider: str,  # 'google', 'apple', 'akahu'
@@ -12,13 +13,14 @@ class ExternalIdentity:
             meta: dict,
             connected_at: datetime,
     ):
-        self.__provider = provider
-        self.__external_id = external_id
-        self.__email = email
-        self.__name = name
-        self.__avatar_url = avatar_url
-        self.__meta = meta
-        self.__connected_at = connected_at
+        # Validate and assign fields
+        self.__provider = self._validate_string_not_empty(provider, "provider")
+        self.__external_id = self._validate_string_not_empty(external_id, "external_id")
+        self.__email = self._validate_string_not_empty(email, "email", allow_none=True)
+        self.__name = self._validate_string_not_empty(name, "name", allow_none=True)
+        self.__avatar_url = self._validate_string_not_empty(avatar_url, "avatar_url", allow_none=True)
+        self.__meta = self._validate_dict(meta, "meta")
+        self.__connected_at = self._validate_datetime(connected_at, "connected_at")
 
     def __repr__(self):
         return f"<ExternalIdentity: {self.provider}"

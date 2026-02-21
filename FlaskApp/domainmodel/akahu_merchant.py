@@ -1,10 +1,11 @@
 from typing import TYPE_CHECKING
+from FlaskApp.domainmodel.base import ValidatingBaseModel
 
 if TYPE_CHECKING:
     from FlaskApp.domainmodel import Merchant
 
 
-class AkahuMerchant:
+class AkahuMerchant(ValidatingBaseModel):
     def __init__(self,
                  akahu_merchant_id: str,
                  nzbn: str | None,
@@ -12,11 +13,12 @@ class AkahuMerchant:
                  website: str | None,
                  logo: str | None,
                  ):
-        self.__id = akahu_merchant_id
-        self.__nzbn = nzbn
-        self.__name = name
-        self.__website = website
-        self.__logo = logo
+        # Validate and assign immutable fields
+        self.__id = self._validate_string_not_empty(akahu_merchant_id, "akahu_merchant_id")
+        self.__nzbn = self._validate_string_not_empty(nzbn, "nzbn", allow_none=True)
+        self.__name = self._validate_string_not_empty(name, "name")
+        self.__website = self._validate_string_not_empty(website, "website", allow_none=True)
+        self.__logo = self._validate_string_not_empty(logo, "logo", allow_none=True)
 
 
     def __repr__(self):
