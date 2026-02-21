@@ -19,6 +19,8 @@ def account_orm_to_domain(
         created=tx.created,
         credit_limit=tx.credit_limit,
         overdrawn=tx.overdrawn,
+        provider_name=tx.provider_name,
+        provider_logo=tx.provider_logo,
         user=user,
     )
 
@@ -38,5 +40,7 @@ def account_domain_to_orm(
         created=tx.created,
         credit_limit=tx.credit_limit,
         overdrawn=tx.overdrawn,
-        user_id=tx.user.id
+        user_id=tx.user.id,
+        provider_name=tx.provider_name,
+        provider_logo=tx.provider_logo,
     )

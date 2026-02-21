@@ -27,6 +27,10 @@ class AccountRepository:
             return None
         return account_orm_to_domain(orm, user=user)
 
+    def get_all_for_user(self, user: User) -> list[Account]:
+        orms = self._session.query(AccountORM).filter_by(user_id=user.id).all()
+        return [account_orm_to_domain(orm, user=user) for orm in orms]
+
     def exists(self, account_id: str | UUID, user: User) -> bool:
         if isinstance(account_id, str):
             account_id = UUID(account_id)
@@ -39,10 +43,7 @@ class AccountRepository:
             existing.name = account.name
             existing.type = account.type
             existing.currency = account.currency
-            existing.current_balance = account.current_balance
-            existing.available_balance = account.available_balance
             existing.credit_limit = account.credit_limit
-            existing.overdrawn = account.overdrawn
             existing.status = account.status
             # Sync attributes
             existing_attrs = {a.attribute: a for a in
@@ -65,3 +66,11 @@ class AccountRepository:
             for attribute in [AccountAttributeORM(account_id=account.id, attribute=attr) for attr in
                               account.attributes]:
                 self._session.add(attribute)
+
+    def delete(self, user: User, account_id: str | UUID):
+        if isinstance(account_id, str):
+            account_id = UUID(account_id)
+        orm = self._session.query(AccountORM).filter_by(id=account_id, user_id=user.id).first()
+        if not orm:
+            raise Exception("Account not found")
+        orm.status = 'deleted'

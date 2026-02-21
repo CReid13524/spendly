@@ -1,10 +1,11 @@
 from datetime import datetime, timezone
+import uuid
 
 import requests
 
-from FlaskApp.domainmodel import Transaction, Account, ExternalIdentity, User
+from FlaskApp.domainmodel import Account, ExternalIdentity, User, AkahuTransaction, Transaction,AkahuAccount
 from FlaskApp.infra.unit_of_work import AbstractUnitOfWork
-from FlaskApp.routes.akahu.assemblers import akahu_transaction_to_domain, akahu_account_to_domain, \
+from FlaskApp.routes.akahu.assemblers import akahu_pending_transaction_to_domain, akahu_transaction_to_domain, akahu_account_to_domain, \
     akahu_merchant_to_domain, akahu_category_to_domain
 from FlaskApp.infra.exceptions import ValidationError
 
@@ -69,17 +70,24 @@ def sync_akahu(
 
     akahu_accounts = client.get_accounts()
     akahu_transactions = client.get_transactions(full_sync=full_sync)
+    akahu_pending_transactions = client.get_pending_transactions()
 
     with uow:
         # Accounts
+        accounts_for_balancing: list[uuid.UUID] = []
         for acc in akahu_accounts:
             uow.akahu_accounts.log_refresh_attempt(acc['_id'], user=user)  # Not included in update function
 
             # Source exisitng account ID
-            existing_account: Account | None = uow.akahu_accounts.get_connected_account_by_id(acc['_id'], user=user)
+            existing_akahu_account: AkahuAccount | None = uow.akahu_accounts.get(acc['_id'], user=user)
 
             account, akahu_account = akahu_account_to_domain(acc, user=user,
-                                                             existing_account=existing_account)
+                                                             existing_akahu_account=existing_akahu_account)
+
+            # Must be done after transactions. Akahu balance = sum of transactions + Missing transactions (Akahu holds only 1 year before sign-up)
+            if not existing_akahu_account:
+                accounts_for_balancing.append(akahu_account.id)
+
             uow.accounts.add_or_update(account, user=user)
             uow.akahu_accounts.add_or_update(akahu_account, user=user)
 
@@ -110,14 +118,12 @@ def sync_akahu(
             category = None
 
             # Source existing transaction by Akahu transaction ID
-            existing_transaction: Transaction | None = uow.akahu_transactions.get_connected_transaction_by_id(tx['_id'],
-                                                                                                              user=user)
+            existing_transaction: AkahuTransaction | None = uow.akahu_transactions.get(tx['_id'], user=user)
 
             # Transaction
             transaction, akahu_transaction = akahu_transaction_to_domain(
                 akahu_tx=tx,
-                is_pending=False,  # This endpointpoint does not consider pending transaction.
-                existing_transaction=existing_transaction,
+                existing_akahu_transaction=existing_transaction,
                 user=user,
                 account=account,
                 akahu_account=akahu_account,
@@ -129,6 +135,57 @@ def sync_akahu(
 
             uow.transactions.add_or_update(transaction, user=user)
             uow.akahu_transactions.add_or_update(akahu_transaction, user=user)
+
+        # Remove all pending transactions that are not user enforced
+        # Hard delete since this data is considered volatile, with no definitve 'already imported' state, cannot be updated
+        uow.akahu_transactions.delete_all_pending_transactions(user=user)
+
+        # Pending Transactions
+        for tx in akahu_pending_transactions:
+            akahu_account = uow.akahu_accounts.get(tx['_account'], user=user)
+            if not akahu_account:
+                raise Exception(f"Akahu Account not found")
+            account = akahu_account.account
+
+            # Transaction
+            transaction, akahu_transaction = akahu_pending_transaction_to_domain(
+                akahu_tx=tx,
+                user=user,
+                account=account,
+                akahu_account=akahu_account,
+            )
+
+            uow.transactions.add(transaction)
+            uow.akahu_transactions.add(akahu_transaction)
+
+        for account_id in accounts_for_balancing:
+            balance_akahu_account(uow=uow, akahu_account_id=account_id, user=user)
+
+
+def balance_akahu_account(uow: AbstractUnitOfWork, akahu_account_id: str, user: User):
+    akahu_account = uow.akahu_accounts.get(akahu_account_id, user=user)
+    account = akahu_account.account
+
+    # Rebalance account balance based on sum of transactions
+    balancing_amount = akahu_account.current_balance - account.current_balance
+    balancing_transaction = Transaction(
+        transaction_id=uuid.uuid4(),
+        amount=balancing_amount, # Convert back to cents for transaction amount
+        date=datetime.now(tz=timezone.utc),
+        description="SYSTEM BALANCE ADJUSTMENT",
+        balance=None,
+        pending=False,
+        transaction_type=None,
+        status='hidden_active',
+        created=datetime.now(tz=timezone.utc),
+        latitude=None,
+        longitude=None,
+        category=None,
+        account=account,
+        merchant=None,
+        user=user
+    )
+    uow.transactions.add(balancing_transaction)
 
 
 class AkahuClient:
@@ -154,7 +211,7 @@ class AkahuClient:
         if not response.ok:
             raise Exception(f"Error fetching accounts: {data.get('message', 'Unknown error')}")
 
-        return data.get("items", [])
+        return data.get("items")
 
     def get_transactions(self, full_sync: bool = False):
         headers = self._get_headers()
@@ -184,6 +241,20 @@ class AkahuClient:
                 break
         return transactions
 
+    def get_pending_transactions(self):
+        headers = self._get_headers()
+
+        response = requests.get(
+            f"{self.base_url}/transactions/pending",
+            headers=headers
+        )
+        data = response.json()
+
+        if not response.ok:
+            raise Exception(f"Error fetching pending transactions: {data.get('message', 'Unknown error')}")
+
+        return data.get("items")
+
     def get_me(self):
         headers = self._get_headers()
 
@@ -197,3 +268,13 @@ class AkahuClient:
             raise ValidationError(f"Invalid Akahu credentials ({data.get('message', 'Unknown error')})")
 
         return data.get("item")
+
+def get_akahu_accounts(
+        uow: AbstractUnitOfWork,
+        user: User,
+        compare: bool
+):
+    with uow:
+        akahu_accounts = uow.akahu_accounts.list_akahu_accounts(user=user)
+        response = {akahu_account: akahu_account.account for akahu_account in akahu_accounts} if compare else akahu_accounts
+        return response
