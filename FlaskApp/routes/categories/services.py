@@ -13,8 +13,8 @@ def get_categories(uow: AbstractUnitOfWork, user: User) -> list[Category]:
 def create_category(uow: AbstractUnitOfWork, user: User, name: str, description: str, colour: str, icon: str | None, type: str, parent_category_id: str | None):
     # TODO: Category type validation
     with uow:
-        parent_category = uow.categories.get(parent_category_id)
-        if not parent_category_id and not parent_category:
+        parent_category = uow.categories.get(parent_category_id, user=user) if parent_category_id else None
+        if parent_category_id and not parent_category:
             raise Exception("Parent category not found")
         category = Category(
             category_id=uuid4(),
@@ -29,12 +29,12 @@ def create_category(uow: AbstractUnitOfWork, user: User, name: str, description:
         )
         uow.categories.add(category)
 
-def update_category(uow: AbstractUnitOfWork, user: User, id: str, name: str, description: str, colour: str, icon: str | None, type: str, parent_category_id: str | None):
+def update_category(uow: AbstractUnitOfWork, user: User, category_id: str, name: str, description: str, colour: str, icon: str | None, type: str, parent_category_id: str | None):
     # TODO: Category type validation
     parent_category_id = parent_category_id if parent_category_id else None
     parent_category = None
     with uow:
-        category = uow.categories.get(id, user=user)
+        category = uow.categories.get(category_id, user=user)
         if not category:
             raise Exception("Category not found")
         if parent_category_id:

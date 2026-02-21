@@ -1,4 +1,4 @@
-from sqlalchemy import JSON, UUID, Column, DateTime, ForeignKey, String
+from sqlalchemy import JSON, UUID, Boolean, Column, DateTime, ForeignKey, BigInteger, String
 from sqlalchemy.orm import relationship
 
 from FlaskApp.infra.db.base import Base
@@ -11,6 +11,15 @@ class AkahuTransactionORM(Base):
     created = Column(DateTime, nullable=False)
     updated = Column(DateTime, nullable=False)
     meta = Column(JSON, nullable=True)
+
+    # Standard transaction fields
+    amount = Column(BigInteger, nullable=False)
+    date = Column(DateTime, nullable=False)
+    description = Column(String, nullable=False)
+    balance = Column(BigInteger, nullable=True)
+    type = Column(String, nullable=True)
+    pending = Column(Boolean, nullable=False)
+
     user_id = Column(UUID(as_uuid=True), ForeignKey('users.id'), nullable=False)
     transaction_id = Column(UUID(as_uuid=True), ForeignKey('transactions.id'), nullable=False, unique=True)
     akahu_account_id = Column(String, ForeignKey('akahu_accounts.id'), nullable=False)

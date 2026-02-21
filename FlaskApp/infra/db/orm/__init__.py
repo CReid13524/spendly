@@ -1,5 +1,5 @@
 from FlaskApp.infra.db.orm.account_orm import AccountORM, AccountAttributeORM
-from FlaskApp.infra.db.orm.akahu_account_orm import AkahuAccountORM
+from FlaskApp.infra.db.orm.akahu_account_orm import AkahuAccountORM, AkahuAccountAttributeORM
 from FlaskApp.infra.db.orm.akahu_category_orm import AkahuCategoryORM
 from FlaskApp.infra.db.orm.akahu_merchant_orm import AkahuMerchantORM
 from FlaskApp.infra.db.orm.akahu_transaction_orm import AkahuTransactionORM

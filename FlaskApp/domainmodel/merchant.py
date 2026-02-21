@@ -1,11 +1,12 @@
 from typing import TYPE_CHECKING
 from uuid import UUID
+from FlaskApp.domainmodel.base import ValidatingBaseModel
 
 if TYPE_CHECKING:
     from FlaskApp.domainmodel import User
 
 
-class Merchant:
+class Merchant(ValidatingBaseModel):
     def __init__(self,
                  merchant_id: UUID,
                  nzbn: str | None,
@@ -16,13 +17,15 @@ class Merchant:
                  user: 'User'
                  ):
 
-        self.__id = merchant_id
-        self.__nzbn = nzbn
-        self.__name = name
-        self.__website = website
-        self.__logo = logo
+        # Validate and assign immutable fields
+        self.__id = self._validate_uuid(merchant_id, "merchant_id")
+        self.__user = self._validate_not_none(user, "user")
 
-        self.__user = user
+        # Assign mutable fields via setters
+        self.name = name
+        self.nzbn = nzbn
+        self.website = website
+        self.logo = logo
 
     def __repr__(self):
         return f"<Merchant {self.id}: {self.name}>"
@@ -47,15 +50,17 @@ class Merchant:
     def nzbn(self):
         return self.__nzbn
 
+    @nzbn.setter
+    def nzbn(self, value):
+        self.__nzbn = self._validate_string_not_empty(value, "nzbn", allow_none=True)
+
     @property
     def name(self):
         return self.__name
 
     @name.setter
     def name(self, value: str):
-        if not isinstance(value, str):
-            raise TypeError
-        self.__name = value
+        self.__name = self._validate_string_not_empty(value, "name")
 
     @property
     def website(self):
@@ -63,9 +68,7 @@ class Merchant:
 
     @website.setter
     def website(self, value):
-        if not isinstance(value, str):
-            raise TypeError
-        self.__website = value
+        self.__website = self._validate_string_not_empty(value, "website", allow_none=True)
 
     @property
     def logo(self):
@@ -73,6 +76,4 @@ class Merchant:
 
     @logo.setter
     def logo(self, value):
-        if not isinstance(value, str):
-            raise TypeError
-        self.__logo = value
+        self.__logo = self._validate_string_not_empty(value, "logo", allow_none=True)

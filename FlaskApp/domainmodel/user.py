@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import TYPE_CHECKING, List
 from uuid import UUID
+from FlaskApp.domainmodel.base import ValidatingBaseModel
 
 import bcrypt
 
@@ -12,7 +13,7 @@ from FlaskApp.domainmodel.account import Account
 from FlaskApp.domainmodel.category import Category
 
 
-class User:
+class User(ValidatingBaseModel):
     def __init__(self,
                  user_id: UUID,
                  email: str,
@@ -23,13 +24,14 @@ class User:
                  last_active: datetime | None,  # None if never logged in
                  ):
 
-        self.__id = user_id
-        self.__email = email
-        self.__name = name
-        self.__password = password
-        self.__status = status
-        self.__created = created
-        self.__last_active = last_active
+        # Validate and assign fields
+        self.__id = self._validate_uuid(user_id, "user_id")
+        self.__email = self._validate_string_not_empty(email, "email")
+        self.__name = self._validate_string_not_empty(name, "name")
+        self.__password = self._validate_string_not_empty(password, "password", allow_none=True)
+        self.__status = self._validate_string_not_empty(status, "status")
+        self.__created = self._validate_datetime(created, "created")
+        self.__last_active = self._validate_datetime(last_active, "last_active", allow_none=True)
 
         self.__accounts: List['Account'] = []
         self.__categories: List['Category'] = []

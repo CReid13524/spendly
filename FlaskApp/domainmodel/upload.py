@@ -1,12 +1,19 @@
 from datetime import datetime
+import enum
 from typing import TYPE_CHECKING
 from uuid import UUID
+from FlaskApp.domainmodel.base import ValidatingBaseModel
 
 if TYPE_CHECKING:
     from FlaskApp.domainmodel import User
 
 
-class Upload:
+class SupportedBank(enum.Enum):
+    ANZ = 'anz'
+    KIWIBANK = 'kiwibank'
+
+
+class Upload(ValidatingBaseModel):
     def __init__(self,
                  upload_id: UUID,
                  created: datetime,
@@ -18,13 +25,20 @@ class Upload:
                  user: 'User'
                  ):
 
-        self.__id = upload_id
-        self.__created = created
+        # Validate and assign fields
+        self.__id = self._validate_uuid(upload_id, "upload_id")
+        self.__created = self._validate_datetime(created, "created")
+        test_bank = SupportedBank(bank)
+        _ = self._validate_type(test_bank, SupportedBank, "bank") # Validate bank
         self.__bank = bank
-        self.__file_name = file_name
+        self.__file_name = self._validate_string_not_empty(file_name, "file_name")
+        self.__status = self._validate_string_not_empty(status, "status")
+        # Validate list of UUIDs
+        self._validate_type(transaction_ids, list, "transaction_ids")
+        for tid in transaction_ids:
+            self._validate_uuid(tid, "transaction_id in list")
         self.__transaction_ids = transaction_ids
-        self.__status = status
-        self.__user = user
+        self.__user = self._validate_not_none(user, "user")
 
     def __repr__(self):
         return f"<Upload {self.id}: {self.file_name}>"
@@ -66,6 +80,5 @@ class Upload:
         return self.__transaction_ids
 
     def add_transaction(self, transaction_id: UUID):
-        if not isinstance(transaction_id, UUID):
-            raise TypeError
+        self._validate_uuid(transaction_id, "transaction_id")
         self.__transaction_ids.append(transaction_id)

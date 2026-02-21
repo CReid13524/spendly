@@ -1,18 +1,20 @@
 from typing import TYPE_CHECKING, List
+from FlaskApp.domainmodel.base import ValidatingBaseModel
 
 if TYPE_CHECKING:
     from FlaskApp.domainmodel import AkahuTransaction
 
 
-class AkahuCategory:
+class AkahuCategory(ValidatingBaseModel):
     def __init__(self,
                  nzfcc_id: str,
                  nzfcc_name: str,
                  groups: dict[str, dict[str, str]],
                  ):
-        self.__id = nzfcc_id
-        self.__name = nzfcc_name
-        self.__groups = groups
+        # Validate and assign immutable fields
+        self.__id = self._validate_string_not_empty(nzfcc_id, "nzfcc_id")
+        self.__name = self._validate_string_not_empty(nzfcc_name, "nzfcc_name")
+        self.__groups = self._validate_dict(groups, "groups")
         self.__transactions: List['AkahuTransaction'] = []
 
     def __repr__(self):

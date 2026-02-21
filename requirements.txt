@@ -10,3 +10,4 @@ requests
 flask_cors
 sqlalchemy
 werkzeug
+iso4217

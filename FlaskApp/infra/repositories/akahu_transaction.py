@@ -4,6 +4,7 @@ from FlaskApp.domainmodel import AkahuTransaction, Transaction, User
 from FlaskApp.infra.db.mappers import akahu_transaction_orm_to_domain, akahu_transaction_domain_to_orm, \
     transaction_orm_to_domain, user_orm_to_domain
 from FlaskApp.infra.db.orm import AkahuTransactionORM
+from FlaskApp.infra.db.orm.transaction_orm import TransactionORM
 
 
 class AkahuTransactionRepository:
@@ -39,3 +40,31 @@ class AkahuTransactionRepository:
         else:
             orm = akahu_transaction_domain_to_orm(akahu_transaction)
             self.session.add(orm)
+    def list_pending_transactions(self, user: User) -> list[AkahuTransaction]:
+        orms = self.session.query(AkahuTransactionORM).filter_by(pending=True, user_id=user.id).all()
+        user = user_orm_to_domain(orms[0].user) if orms else None
+        return [akahu_transaction_orm_to_domain(orm, user=user) for orm in orms]
+
+    def delete_all_pending_transactions(self, user: User):
+        # Find AkahuTransactionORMs with pending=True and related TransactionORM with pending=True
+        from sqlalchemy import and_, select
+
+        # Get transaction IDs to delete
+        subquery = (
+            self.session.query(AkahuTransactionORM.transaction_id)
+            .join(TransactionORM, AkahuTransactionORM.transaction_id == TransactionORM.id)
+            .filter(
+                AkahuTransactionORM.pending == True,
+                AkahuTransactionORM.user_id == user.id,
+                TransactionORM.pending == True
+            )
+            .subquery()
+        )
+        # Delete from TransactionORM
+        self.session.query(TransactionORM).filter(TransactionORM.id.in_(select(subquery))).delete(synchronize_session=False)
+        # Delete from AkahuTransactionORM
+        self.session.query(AkahuTransactionORM).filter(
+            AkahuTransactionORM.pending == True,
+            AkahuTransactionORM.user_id == user.id,
+            AkahuTransactionORM.transaction_id.in_(select(subquery))
+        ).delete(synchronize_session=False)

@@ -1,34 +1,43 @@
 from datetime import datetime
+import enum
 from typing import TYPE_CHECKING
 from uuid import UUID
+from FlaskApp.domainmodel.base import ValidatingBaseModel
 
 if TYPE_CHECKING:
     from FlaskApp.domainmodel import User
 
 
-class Category:
+class CategoryType(enum.Enum):
+    EXPENSE = 'expense'
+    INCOME = 'income'
+    ALL = 'all'
+
+class Category(ValidatingBaseModel):
     def __init__(self,
                  category_id: UUID,
                  name: str,
                  description: str,
                  colour: str,
                  icon: str | None,
-                 category_type: str,
+                 category_type: CategoryType,
                  created: datetime,
 
                  parent_category: 'Category | None',
                  user: 'User'
                  ):
-        self.__id = category_id
-        self.__name = name
-        self.__description = description
-        self.__colour = colour
-        self.__icon = icon
-        self.__type = category_type
-        self.__created = created
+        # Validate and assign immutable fields
+        self.__id = self._validate_uuid(category_id, "category_id")
+        self.__created = self._validate_datetime(created, "created")
+        self.__user = self._validate_not_none(user, "user")
 
-        self.__user = user
-        self.__parent_category = parent_category
+        # Assign mutable fields via setters
+        self.name = name
+        self.description = description
+        self.colour = colour
+        self.icon = icon
+        self.type = category_type
+        self.parent_category = parent_category
 
     def __repr__(self):
         return f"<Category {self.id}: {self.name}>"
@@ -51,9 +60,7 @@ class Category:
 
     @name.setter
     def name(self, value):
-        if not isinstance(value, str):
-            raise TypeError
-        self.__name = value
+        self.__name = self._validate_string_not_empty(value, "name")
 
     @property
     def description(self):
@@ -61,9 +68,7 @@ class Category:
 
     @description.setter
     def description(self, value):
-        if not isinstance(value, str):
-            raise TypeError
-        self.__description = value
+        self.__description = self._validate_type(value, str, "description")
 
     @property
     def colour(self):
@@ -71,9 +76,7 @@ class Category:
 
     @colour.setter
     def colour(self, value):
-        if not isinstance(value, str):
-            raise TypeError
-        self.__colour = value
+        self.__colour = self._validate_string_not_empty(value, "colour")
 
     @property
     def icon(self):
@@ -81,9 +84,7 @@ class Category:
 
     @icon.setter
     def icon(self, value):
-        if not isinstance(value, str | None):
-            raise TypeError
-        self.__icon = value
+        self.__icon = self._validate_string_not_empty(value, "icon", allow_none=True)
 
     @property
     def type(self):
@@ -91,8 +92,16 @@ class Category:
 
     @type.setter
     def type(self, value):
-        if not isinstance(value, str):
-            raise TypeError
+        if isinstance(value, str):
+            try:
+                test_value = CategoryType(value)
+                self._validate_type(test_value, CategoryType, "type")
+            except ValueError:
+                raise ValueError(f"Invalid CategoryType: {value}")
+        elif isinstance(value, CategoryType):
+            self._validate_type(value, CategoryType, "type")
+        else:
+            raise TypeError(f"Invalid type for CategoryType: {type(value).__name__}")
         self.__type = value
 
     @property
@@ -105,8 +114,8 @@ class Category:
 
     @parent_category.setter
     def parent_category(self, value):
-        if not isinstance(value, Category | None):
-            raise TypeError
+        if value is not None and not isinstance(value, Category):
+            raise TypeError(f"parent_category must be a Category object, got {type(value).__name__}")
         self.__parent_category = value
 
     @property
